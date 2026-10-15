@@ -1,0 +1,53 @@
+The paper proposes ADAPT, a perceptive locomotion framework for
+humanoid robots. ADAPT decomposes local 3D geometry into two compact
+projections: a horizontal elevation map for footholds and a vertical
+distance map for body-level clearance. Moreover, it adds the sensing
+radius as an extra action of the reinforcement learning policy. The
+authors compare ADAPT  in simulation against PIM, Humanoid Parkour, a
+TSDF, and Gallant, and deployed zero-shot on a Unitree G1.
+
+To my knowledge, the content of the article is novel and sufficiently
+significant. The authors justify their method well and are clear in the
+explanation of the limits of baseline methods and the strengths of
+their proposed technique. The experiments validate the authors
+assumptions. 
+The organization of the paper is adequate, with one exception listed
+below. to my knowledge, the citations are adequate.
+
+I believe this to be a valuable contribution, still I believe some
+parts could be clearer.
+
+1. There is a possible typo in the introduction: “3-D negotiation
+tasks”, you mean “3-D navigation tasks”?
+
+2. In the introduction, you claim that the adaptive sensing mechanism
+is responsible for reducing the computational overhead by 56%. Where in
+the experiment section do you support this claim? The same question
+holds for the 98.6% reduction in observation dimensionality with
+respect to voxel-based methods that is claimed in the abstract. I think
+this comparison could be more clearly stated.
+
+3. The abstract, introduction, and Sec. II-B say the radius modulates
+the vertical map only. Sec. III-B-1 says it acts as "a dynamic gain
+modulating the field of view for both projection maps." Is the
+horizontal map also influenced by the radius? 
+
+4. Was the ablation study on the adaptive radius mechanism done in
+simulation or in the real-world? Discussing Table V results in Sec.
+IV-C-1 creates confusion.
+
+5. The ablation shows that without the adaptive reward the policy fails
+to learn the optimal radius as speed increases. Do you have an
+explanation on why that happens? Which part of the adaptive reward is
+responsible for retrieving the optimal policy? Is the optimal reward
+basically enforcing a hand-designed heuristic? Understanding this could
+help better define the scope of the contribution.
+
+6. Fig.1 makes it look like the actor also receives the privileged
+states, which contradicts what is claimed by the text in Sec. III-C. I
+also think Fig.1 could be more informative if it showed the recurrent
+nature of the actor. 
+
+7. Fig. 5 only shows the average success rates, it would be better to
+show also confidence intervals/variance. The plot as it is does not
+give information on how much performance varies across seeds.

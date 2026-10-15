@@ -1,0 +1,38 @@
+This paper presents ADAPT, a perceptive locomotion framework for
+humanoid robots that decomposes local 3D geometry into two projections:
+a horizontal elevation map and a vertical distance map. The proposed
+approach is evaluated against several representative baselines and is
+further deployed on a Unitree G1 humanoid robot in the real world. My
+comments are as follows.
+
+1. This paper addresses an important problem in perceptive locomotion,
+and the motivation is well established.
+
+2. Incorporating the perception radius into the policy’s action space
+is a clever design choice. It allows the robot to adaptively adjust its
+perceptual range according to the requirements of different 3D
+locomotion tasks.
+
+3. Table III shows that ADAPT outperforms all baselines, including some
+computationally intensive voxel-based approaches. Given that voxel
+representations retain richer 3D geometric information, it would be
+helpful for the authors to provide further analysis explaining why
+these methods perform worse than ADAPT. In particular, the paper should
+clarify whether the performance gap arises from optimization
+difficulty, limited network capacity, training-budget constraints,
+representation redundancy, or other implementation factors.
+
+4. The real-world experiments provide valuable hardware validation.
+However, for the drop experiment, it is difficult to determine whether
+the robot recovers its balance autonomously or whether its fall is
+arrested by the safety tether.
+
+5. Table IV reports training efficiency, but inference efficiency is
+arguably more important for perceptive locomotion because training is
+performed offline, whereas perception and control must operate under
+strict real-time constraints during deployment. The authors are
+encouraged to report inference-time benchmarks, including
+map-construction latency, policy inference latency, total
+perception-to-control latency, and onboard computational resource
+usage. A comparison of these quantities across ADAPT and the main
+baselines would better support the paper’s efficiency claims.

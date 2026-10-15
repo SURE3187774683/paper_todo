@@ -1,0 +1,48 @@
+This paper received two higly qualified reviews and both reviwers agree
+that the paper addresses a relavant problem in perceptive locomotion,
+is well motivated and proposes an interesting approach to cope with
+different requirements of 3D real-world locomotion tasks, depending on
+how far ahead it perceives obstacles. The environment is compacted into
+two perspectives: vertical and horizontal and the policy additionally
+outputs the sensing radius as an action. ADAPT is compared in
+simulation against PIM, Humanoid Parkour, a TSDF-based method, and
+Gallant, and is deployed zero-shot on a Unitree G1.
+
+
+Both reviewers highlight unsupported claims in the paper:
+
+-	Authors claim that ADAPT provides a more compact representation
+and potentially makes reinforcement learning more computationally
+efficient, compared with voxel-based alternatives. The authors should
+specify how the comparisons were conducted. They have to provide enough
+detail to verify both the dimensionality reduction and the
+training-speed comparison. In particular, R8 asks where the 56%
+computational overhead reduction and the 98.6%
+observation-dimensionality reduction are supported. R3 notes that Table
+IV reports only training efficiency, whereas inference efficiency
+matters more for real-time perceptive control. R3 also asks for latency
+and onboard resource measurements against the main baselines. 
+
+The results need deeper analysis:
+-	Note that voxel-based representations are not inherently
+inferior; they simply encode the environment differently and may have
+different computational trade-offs. R3 mentions that authors should
+analyze why the voxel-based baselines underperform, addressing the
+possible factors: optimization difficulty, network capacity, training
+budget, representation redundancy, or implementation factors
+-	Explain the role of the adaptive reward in learning the optimal
+radius, and clarify how much of it encodes a hand-designed heuristic.
+
+Clarifications and presentation.
+-	(R8) Resolve the inconsistency over whether the radius
+modulates only the vertical map (abstract, introduction, Sec. II-B) or
+both maps (Sec. III-B-1).
+-	(R8) State whether the adaptive-radius ablation (Table V, Sec.
+IV-C-1) was run in simulation or on hardware, and fix the discussion in
+that section accordingly.
+-	(R3) For the drop experiment, make clear whether the robot
+recovers balance autonomously or the safety tether arrests the fall.
+-	(R8)Add confidence intervals or variance across seeds to Fig.
+5.
+-	(R8) Fix the likely typo “3-D negotiation tasks” in the
+introduction (probably “navigation”).
