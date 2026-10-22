@@ -7,7 +7,7 @@
 \newenvironment{reviewcomment}{\begin{quote}\color{reviewblue}\itshape}{\end{quote}}
 \newcommand{\Response}{\par\noindent\textbf{Response.}\ }
 \newcommand{\Changes}{\par\noindent\textbf{Changes in the revised manuscript.}\ }
-\newcommand{\Pending}{\par\noindent\textbf{Response.}\ \textit{[To be completed after the corresponding experiments.]}}
+\newcommand{\Location}[1]{\par\noindent\textbf{Location in the revised manuscript.}\ #1}
 \begin{document}
 \begin{center}
 {\LARGE\bfseries Statement of Changes and Response to Reviewers}\\[0.8em]
@@ -22,84 +22,129 @@ Thank you for your careful assessment and constructive suggestions. We have revi
 The principal revisions are summarized below:
 \begin{itemize}
     \item We have specified the Gallant comparison: $98.6\%$ fewer per-frame pre-encoder exteroceptive values, approximately $56\%$ lower peak GPU memory, and $32.7\%$ of Gallant's training-iteration time under the stated training settings.
-    \item We have clarified that adaptive perception uses radius smoothness and regularization rather than a speed- or obstacle-dependent target radius. The detailed reward formulas are written in the supplementary source under Reward Function Details.
+    \item We have clarified that adaptive perception uses radius smoothness and regularization rather than a speed- or obstacle-dependent target radius, and specified the reward formulas and weights in the detailed responses.
     \item We have clarified that the adaptive radius changes only the vertical distance map; the horizontal elevation map retains fixed coverage and sampling resolution, consistent with Sec.~II-B.
     \item We have specified that the adaptive-radius ablation in Table~V is a simulation experiment, identified which two reward terms are removed, and removed the Table~V comparison from Sec.~IV-C-1.
     \item We have revised Fig.~1 and Sec.~III-C to distinguish the actor from the privileged critic and show separate recurrent LSTM states. We have added approximate 95\% Wilson intervals for the pooled success outcomes in Fig.~5 (Sec.~IV-C-2), and corrected the typo in Sec.~I.
 \end{itemize}
 
-In the detailed response below, the Associate Editor's points are summarized and the reviewers' comments are reproduced with minor typographic normalization in \textcolor{reviewblue}{blue italics}; our responses appear in black. Responses requiring additional experiments are intentionally left pending.
+In the detailed response below, the Associate Editor's points are summarized and the reviewers' comments are reproduced with minor typographic normalization in \textcolor{reviewblue}{blue italics}; our responses appear in black. Each response identifies the relevant manuscript sections and figures or tables; clarifications provided only in this letter are explicitly distinguished from manuscript changes.
 
 \clearpage
 \section*{Response to the Associate Editor's Report (ReportOn26-3482v1)}
+\subsection*{AE Overall assessment}
+\begin{reviewcomment}
+Both reviewers find the problem relevant and well motivated, and recognize the interest of adjusting how far ahead the robot perceives obstacles for different 3D locomotion tasks. The report summarizes ADAPT's horizontal and vertical projections, policy-controlled sensing radius, simulation comparisons with PIM, Humanoid Parkour, TSDF, and Gallant, and zero-shot deployment on a Unitree G1.
+\end{reviewcomment}
+\Response We sincerely thank the Associate Editor for the thoughtful assessment and for recognizing the motivation and practical relevance of the work. We also appreciate the careful summary of the dual-projection representation, adaptive sensing radius, baseline evaluations, and real-world deployment. The specific concerns raised in the report have helped us clarify the scope and evidence of our efficiency claims and improve the presentation of the method and experiments.
+
 \subsection*{AE Comment 1: Evidence for compactness and computational efficiency}
 \begin{reviewcomment}
 Authors claim that ADAPT provides a more compact representation and potentially makes reinforcement learning more computationally efficient, compared with voxel-based alternatives. The authors should specify how the comparisons were conducted. They have to provide enough detail to verify both the dimensionality reduction and the training-speed comparison. In particular, R8 asks where the 56\% computational overhead reduction and the 98.6\% observation-dimensionality reduction are supported. R3 notes that Table IV reports only training efficiency, whereas inference efficiency matters more for real-time perceptive control. R3 also asks for latency and onboard resource measurements against the main baselines.
 \end{reviewcomment}
-\Response The 56\% figure refers to \emph{peak GPU memory during training} relative to the Gallant voxel baseline, rather than to general computational overhead. With the same GPU, parallel environment count, rollout length, PPO epochs, and batch settings, peak memory is 36,054\,MiB for Gallant and 15,870\,MiB for ADAPT: $(36{,}054-15{,}870)/36{,}054=55.98\%$. The respective iteration times are 34.6\,s and 11.3\,s, so ADAPT takes 32.7\% of Gallant's time under this setup. These are comparisons of the implemented representation and encoder pipelines, not an isolated measurement of adaptive-radius control.
+\Response The 56\% figure refers to \emph{peak GPU memory during training} relative to the Gallant voxel baseline. With the same GPU, parallel environment count, rollout length, PPO epochs, and batch settings, peak memory is 36,054\,MiB for Gallant and 15,870\,MiB for ADAPT: $(36{,}054-15{,}870)/36{,}054=55.98\%$. The respective iteration times are 34.6\,s and 11.3\,s, so ADAPT takes 32.7\% of Gallant's time under this setup.
 
-The 98.6\% figure compares \emph{single-frame external perception inputs before encoding}. Gallant's $32\times32\times40$ voxel grid has 40,960 values; ADAPT's $21\times17$ horizontal elevation and $13\times17$ vertical distance maps have 578 values in total. Thus $(40{,}960-578)/40{,}960=98.59\%$. This does not compare total actor observation sizes or learned feature dimensions.
-\Changes Sec.~I restates the two efficiency quantities without attributing them to radius selection. Table~I in Sec.~II-A defines the pre-encoder sensory dimension, and Sec.~IV-B-3 derives the comparison from those dimensions and the training measurements in Table~IV. Deployment latency and onboard resources remain pending under Reviewer~3, Comment~5.
+The 98.6\% figure compares \emph{single-frame external perception inputs before encoding}. Gallant's $32\times32\times40$ voxel grid has 40,960 values; ADAPT's $21\times17$ horizontal elevation and $13\times17$ vertical distance maps have 578 values in total. Thus $(40{,}960-578)/40{,}960=98.59\%$.
+
+For deployment efficiency, We added experiment for deploy lantency and computational resource usage. Table~IV(b) compares ADAPT with the main voxel baseline, Gallant, on the same local computer (Intel i7-12700H CPU and NVIDIA RTX 3060 Laptop GPU). Mean map-construction latency decreases from 64.06 to 41.64\,ms, policy GPU inference latency from 1.91 to 1.40\,ms, and perception-to-command-publication latency from 79.45 to 55.94\,ms (29.6\% lower). Sampled peak GPU memory decreases from 5,711 to 2,373\,MiB (58.4\% lower); mean whole-host CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04\,GiB.
+\Changes Sec.~I restates the two efficiency quantities without attributing them to radius selection. Table~I in Sec.~II-A defines the pre-encoder sensory dimension, and Sec.~IV-B-3 derives the comparison from those dimensions and the training measurements in Table~IV. Table~IV(b) and Sec.~IV-C-3 report the runtime comparison, measurement boundaries, hardware, and trial setup on the local computer; these are not Jetson Orin NX measurements.
+\Location{Abstract and Sec.~I, the paragraph beginning \textit{Empirical evaluation}; Sec.~II-A, Table~I caption; Sec.~IV-B-3, the two paragraphs immediately before Table~IV; Table~IV(a)--(b); and Sec.~IV-C-3 (Runtime Efficiency).}
+
+
 
 \subsection*{AE Comment 2: Voxel baselines and adaptive reward}
 \begin{reviewcomment}
 Voxel-based representations are not inherently inferior and can have different computational trade-offs. Analyze whether the voxel-based baselines' performance gap arises from optimization difficulty, network capacity, training budget, representation redundancy, or implementation factors. Explain the role of the adaptive reward in learning the radius and clarify whether it encodes a hand-designed heuristic.
 \end{reviewcomment}
-\Pending
-% TODO: Complete after voxel-baseline experiments; cite Reviewer 8, Comment 5
-% for the separately drafted adaptive-reward explanation.
+\Response For the voxel baseline used in this study, insufficient look-ahead at high speeds leaves too little time to adjust motion smoothly and causes poorer traversal performance. In our high-speed tests, the robot decelerated abruptly after obstacles entered the sensing range and sometimes subsequently lost balance. ADAPT allows the policy to adjust the sensing range with its motion state, providing additional look-ahead for timely motion adjustment.
+
+The adaptive reward contains radius smoothness and regularization terms. With current radius $r_t$, previous radius $r_{t-1}$, and initial radius $r_{\mathrm{init}}$, their contributions are $R_{\mathrm{smooth}}(t)=-\lambda_s|r_t-r_{t-1}|$ and $R_{\mathrm{reg}}(t)=-\lambda_r(r_t-r_{\mathrm{init}})^2$, where $\lambda_s=\lambda_r=0.1$ during training. Both terms are removed in the reward ablation, while the radius remains in the observation and action spaces. The terms discourage abrupt radius changes and drift from the initial radius; neither prescribes a target radius based on speed or obstacle distance. Our interpretation is that, without these terms, unstable radius choices can make future observations less consistent, especially at higher speeds. The ablation removes both terms together, so it does not isolate either term's causal contribution.
+\Location{Sec.~III-B-3, Active Perception item, and Sec.~IV-B-4, the reward-ablation definition and high-speed result discussion. The voxel-baseline look-ahead explanation is provided in this response letter only; no additional manuscript change is claimed for that explanation.}
+
+
 
 \subsection*{AE Comment 3: Clarifications and presentation}
 \begin{reviewcomment}
 Resolve whether the radius changes the vertical map only or both maps. State whether the adaptive-radius ablation was run in simulation or on hardware. Clarify whether the robot recovers autonomously in the drop experiment or the safety tether arrests the fall. Add confidence intervals or variance to Fig. 5, and correct the likely typo in the Introduction.
 \end{reviewcomment}
-\Response The radius affects only the vertical distance map; horizontal-map coverage and resolution are fixed. The Table~V adaptive-radius ablation was run in simulation. We clarify the role of the safety tether in the response to Reviewer~3, Comment~4. We added approximate 95\% Wilson confidence intervals to Fig.~5 for success rates measured across evaluation trials and corrected the Introduction's wording from 3-D negotiation tasks to 3-D navigation tasks.
+\Response The radius affects only the vertical distance map; horizontal-map coverage and resolution are fixed. The Table~V adaptive-radius ablation was run in simulation. In the repeated drop experiment, the robot recovered autonomously; the tether was a hardware safety measure and did not arrest the fall. We reduced its tension and repeated the experiment ten times in the same scene with the same policy to clarify its role. We added approximate 95\% Wilson confidence intervals to Fig.~5 for success rates measured across evaluation trials and removed the erroneous wording \textit{3-D negotiation tasks} from the Introduction.
 \Changes We clarified the maps in Sec.~I, Sec.~II-B, and Sec.~III-B-1, identified the ablation setting in Sec.~IV-B-4, and removed the Table~V comparison from Sec.~IV-C-1. We revised Fig.~5 and its caption in Sec.~IV-C-2 and corrected the typo in Sec.~I.
+
+
+\Location{Sec.~I, the ADAPT overview paragraph; Sec.~II-B, the final ADAPT paragraph; Sec.~III-B-1, Adaptive Perception Radius item; Sec.~IV-B-4 and Table~V; Sec.~IV-C-1; and Fig.~5 with its caption in Sec.~IV-C-2. The spelling correction is in the empirical-evaluation paragraph of Sec.~I. The tether clarification is provided in this response letter only.}
 
 \clearpage
 \section*{Response to Reviewer 3}
+\subsection*{Reviewer 3, General assessment}
+\begin{reviewcomment}
+This paper presents ADAPT, a perceptive locomotion framework for humanoid robots that decomposes local 3D geometry into two projections: a horizontal elevation map and a vertical distance map. The proposed approach is evaluated against several representative baselines and is further deployed on a Unitree G1 humanoid robot in the real world.
+\end{reviewcomment}
+\Response Thank you for your careful reading and for recognizing both the comparative evaluation and the real-world Unitree G1 deployment. We appreciate your constructive comments, which have helped us make the method, baseline comparisons, and deployment evidence clearer.
+
 \subsection*{Reviewer 3, Comment 1: Motivation}
 \begin{reviewcomment}
 This paper addresses an important problem in perceptive locomotion, and the motivation is well established.
 \end{reviewcomment}
 \Response Thank you for recognizing the importance and motivation of this work. ADAPT aims to coordinate limited perceptual resolution with the different look-ahead requirements of locomotion in complex three-dimensional environments.
 
+
 \subsection*{Reviewer 3, Comment 2: Adaptive perception radius}
 \begin{reviewcomment}
 Incorporating the perception radius into the policy's action space is a clever design choice. It allows the robot to adaptively adjust its perceptual range according to the requirements of different 3D locomotion tasks.
 \end{reviewcomment}
-\Response Thank you for this assessment. Including the radius in the action space lets the policy learn locomotion and sensing-range adjustment together. The vertical map's input dimension stays fixed while its radial coverage and sampling interval vary. This mechanism is described in Sec.~III-A and Sec.~III-B-1--III-B-2.
+\Response Thank you for this assessment. Including the radius in the action space lets the policy learn locomotion and sensing-range adjustment together. The vertical map's input dimension stays fixed while its radial coverage and sampling interval vary.
+
 
 \subsection*{Reviewer 3, Comment 3: Voxel-based baseline analysis}
 \begin{reviewcomment}
 Table III shows that ADAPT outperforms all baselines, including some computationally intensive voxel-based approaches. Given that voxel representations retain richer 3D geometric information, it would be helpful for the authors to provide further analysis explaining why these methods perform worse than ADAPT. In particular, the paper should clarify whether the performance gap arises from optimization difficulty, limited network capacity, training-budget constraints, representation redundancy, or other implementation factors.
 \end{reviewcomment}
-\Pending
-% TODO after experiments: separate measured factors from hypotheses; address
-% training budgets, model capacity, optimization, redundancy, and implementation.
+\Response Thank you for this suggestion. For the voxel baseline used in this study, insufficient look-ahead at high speeds leaves too little time to adjust motion smoothly and causes poorer traversal performance. In our high-speed tests, the robot decelerated abruptly after obstacles entered the sensing range and sometimes subsequently lost balance. ADAPT allows the policy to adjust the sensing range with its motion state, providing additional look-ahead for timely motion adjustment.
+\Location{This explanation is provided in the response letter only. The related performance comparison is in Sec.~IV-B-3 and Table~III; no new manuscript paragraph describing abrupt deceleration or loss of balance is claimed.}
+
+
 
 \subsection*{Reviewer 3, Comment 4: Drop experiment and tether}
 \begin{reviewcomment}
 The real-world experiments provide valuable hardware validation. However, for the drop experiment, it is difficult to determine whether the robot recovers its balance autonomously or whether its fall is arrested by the safety tether.
 \end{reviewcomment}
 \Response Thank you for pointing out the video ambiguity. In our repeated drop experiment, the robot recovered autonomously; the tether served as a hardware safety measure rather than arresting the fall. We reduced its tension and repeated the experiment ten times in the same scene with the same policy to clarify its role.
+\Location{Response letter only. The ten repeated drop trials and the role of the safety tether are clarified here; no corresponding addition to the manuscript is claimed.}
+
+
 
 \subsection*{Reviewer 3, Comment 5: Deployment latency and onboard resources}
 \begin{reviewcomment}
 Table IV reports training efficiency, but inference efficiency is arguably more important for perceptive locomotion because training is performed offline, whereas perception and control must operate under strict real-time constraints during deployment. The authors are encouraged to report inference-time benchmarks, including map-construction latency, policy inference latency, total perception-to-control latency, and onboard computational resource usage. A comparison of these quantities across ADAPT and the main baselines would better support the paper's efficiency claims.
 \end{reviewcomment}
-\Pending
-% TODO after experiments: add map-construction, policy-inference, and total
-% perception-to-control latency and onboard resource use to Table IV, for
-% ADAPT and main baselines; specify hardware and measurement statistics.
+\Response Thank you for this suggestion. We have extended Table~IV with runtime measurements for ADAPT and the Gallant voxel baseline and added the measurement setup and analysis in Sec.~IV-C-3. Both methods were deployed and benchmarked on the same local computer with an Intel i7-12700H CPU and an NVIDIA RTX 3060 Laptop GPU with 6 GiB VRAM.
+
+Each method was tested five times on each of three terrain categories: flat ground, a single obstacle, and a complex environment, for 15 trials per method. Latency entries are equal-weight averages of per-trial means and P95s. Map latency spans the input callback to the first observed map-ready event; perception-to-publish latency spans that callback to the first command-publication call using the update. Policy GPU inference latency is measured with current-stream CUDA events. For ADAPT, each map-latency and perception-to-publish entry reports the larger statistic of its two map streams. CPU utilization and RAM usage are whole-host averages, and peak VRAM is the maximum sampled usage.
+
+Relative to Gallant, ADAPT reduces mean map latency from 64.06 to 41.64 ms and mean perception-to-publish latency from 79.45 to 55.94 ms, a 29.6\% reduction for the latter. Mean policy GPU inference latency decreases from 1.91 to 1.40 ms, and sampled peak VRAM decreases from 5,711 to 2,373 MiB (58.4\% lower). Mean CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04 GiB.
+\Changes Table~IV(b) and Sec.~IV-C-3 report the local-computer runtime comparison, measurement boundaries, hardware, and trial setup.
+
+
+\Location{Table~IV(b), including its caption; Sec.~IV-C-3 (Runtime Efficiency); and Sec.~I, the deployment-benchmark sentences in the empirical-evaluation paragraph. The Abstract summarizes the deployment benefits qualitatively.}
 
 \clearpage
 \section*{Response to Reviewer 8}
+\subsection*{Reviewer 8, General assessment}
+\begin{reviewcomment}
+The paper proposes ADAPT, a perceptive locomotion framework for humanoid robots. ADAPT decomposes local 3D geometry into two compact projections: a horizontal elevation map for footholds and a vertical distance map for body-level clearance. Moreover, it adds the sensing radius as an extra action of the reinforcement learning policy. The authors compare ADAPT in simulation against PIM, Humanoid Parkour, a TSDF, and Gallant, and deployed zero-shot on a Unitree G1.
+
+To my knowledge, the content of the article is novel and sufficiently significant. The authors justify their method well and are clear in the explanation of the limits of baseline methods and the strengths of their proposed technique. The experiments validate the authors' assumptions. The organization of the paper is adequate, with one exception listed below. To my knowledge, the citations are adequate. I believe this to be a valuable contribution, still I believe some parts could be clearer.
+\end{reviewcomment}
+\Response We are grateful for your encouraging assessment of the novelty and significance of ADAPT and for your recognition of the motivation, comparisons, and experimental validation. Thank you also for noting that the organization and citations are generally adequate. Your detailed suggestions have helped us resolve the remaining presentation issue and explain the method and results more precisely.
+
 \subsection*{Reviewer 8, Comment 1: Typo}
 \begin{reviewcomment}
 There is a possible typo in the introduction: 3-D negotiation tasks, you mean 3-D navigation tasks?
 \end{reviewcomment}
-\Response Yes. Thank you for catching the error. We changed 3-D negotiation tasks to 3-D navigation tasks in Sec.~I (Introduction).
+\Response Yes. Thank you for catching the error. We removed the erroneous wording \textit{3-D negotiation tasks} when revising Sec.~I (Introduction).
+\Location{Sec.~I (Introduction), the revised empirical-evaluation paragraph. The erroneous wording \textit{3-D negotiation tasks} has been removed during revision.}
+
+
 
 \subsection*{Reviewer 8, Comment 2: Support for the efficiency claims}
 \begin{reviewcomment}
@@ -108,7 +153,10 @@ In the introduction, you claim that the adaptive sensing mechanism is responsibl
 \Response We agree that the original comparison was imprecise. The 56\% result is the reduction in training \emph{peak GPU memory} relative to Gallant: $(36{,}054-15{,}870)/36{,}054=55.98\%$, with values in MiB. Under the stated common GPU and PPO settings, iteration time is 34.6\,s for Gallant and 11.3\,s for ADAPT; ADAPT takes 32.7\% of the baseline's time. These results compare the implemented representation and encoder pipelines, not the isolated effect of adaptive-radius selection.
 
 The 98.6\% result compares only single-frame perception inputs \emph{before encoding}: $32\times32\times40=40{,}960$ voxel values for Gallant versus $21\times17+13\times17=578$ map values for ADAPT, giving $(40{,}960-578)/40{,}960=98.59\%$. It does not compare total actor observations.
-\Changes The Abstract now summarizes improved training efficiency against Gallant and 10-Hz perception updates during deployment without attributing the efficiency difference solely to adaptive radius selection. Sec.~I (Introduction) gives the specific training comparison. Table~I in Sec.~II-A defines sensory dimension as pre-encoder input elements, excluding proprioception, history, and critic-only inputs. Sec.~IV-B-3 (Performance Comparison) gives the dimensional calculation, common training settings, wall-clock iteration times, and peak GPU memory in Table~IV.
+\Changes The Abstract now states a 98.6\% reduction in exteroceptive input dimensionality relative to our implementation of the Gallant baseline and qualitatively summarizes lower deployment latency and resource usage. Sec.~I (Introduction) gives the quantitative training and local-computer deployment comparisons. Table~I in Sec.~II-A defines sensory dimension as pre-encoder input elements, excluding proprioception, history, and critic-only inputs. Sec.~IV-B-3 (Performance Comparison) gives the dimensional calculation, common training settings, wall-clock iteration times, and peak GPU memory in Table~IV.
+\Location{Abstract; Sec.~I, empirical-evaluation paragraph; Sec.~II-A, Table~I caption; Sec.~IV-B-3, dimensionality and training-measurement paragraphs; and Table~IV(a). Deployment measurements are in Table~IV(b) and Sec.~IV-C-3.}
+
+
 
 \subsection*{Reviewer 8, Comment 3: Which map the radius changes}
 \begin{reviewcomment}
@@ -116,13 +164,19 @@ The abstract, introduction, and Sec. II-B say the radius modulates the vertical 
 \end{reviewcomment}
 \Response The adaptive radius affects only the vertical distance map. Horizontal-map coverage and sampling resolution remain fixed.
 \Changes We revised Sec.~I (Introduction), Sec.~III-A (Problem Formulation), Sec.~III-B-1 (Observation Space), Sec.~III-B-2 (Action Space), and Sec.~III-C (Training Architecture) to specify that $r_t$ changes only the vertical map's radial range and sampling interval. The horizontal map remains fixed, consistent with the existing description in Sec.~II-B (Adaptive Perception and Behavior Modulation).
+\Location{Abstract; Sec.~I, ADAPT overview paragraph; Sec.~II-B, final paragraph; Sec.~III-A; Sec.~III-B-1 and Sec.~III-B-2, Adaptive Perception Radius items; Fig.~2 caption; and the final paragraph of Sec.~III-C.}
+
+
 
 \subsection*{Reviewer 8, Comment 4: Ablation setting}
 \begin{reviewcomment}
 Was the ablation study on the adaptive radius mechanism done in simulation or in the real-world? Discussing Table V results in Sec. IV-C-1 creates confusion.
 \end{reviewcomment}
 \Response The adaptive-radius ablation in Table~V was conducted in simulation.
-\Changes Sec.~IV-B-4 (Ablation Study on Adaptive Mechanism) now states that the tests use simulation, with ten trials per method, terrain, and speed command, and identifies the two removed radius-reward terms. We removed the Table~V comparison from Sec.~IV-C-1 (Deployment), which covers hardware tests.
+\Changes Sec.~IV-B-4 (Ablation Study on Adaptive Mechanism) now states that the tests use simulation, with ten trials per method, terrain, and speed command, and identifies the two removed radius-reward terms. It also clarifies that each trial contains five obstacles and that the reported success rate is the fraction of obstacles crossed, with statistics pooled across the three terrains at each speed. We removed the Table~V comparison from Sec.~IV-C-1 (Deployment), which covers hardware tests.
+\Location{Sec.~IV-B-4 (Ablation Study on Adaptive Mechanism), opening paragraph, ablation definitions, and the paragraph defining five-obstacle trial statistics; Table~V; and Sec.~IV-C-1, from which the Table~V discussion has been removed.}
+
+
 
 \subsection*{Reviewer 8, Comment 5: Adaptive reward}
 \begin{reviewcomment}
@@ -133,22 +187,31 @@ The ablation shows that without the adaptive reward the policy fails to learn th
 R_{\mathrm{smooth}}(t)=-\lambda_s|r_t-r_{t-1}|,\qquad
 R_{\mathrm{reg}}(t)=-\lambda_r(r_t-r_{\mathrm{init}})^2,
 \]
-where $\lambda_s=\lambda_r=0.1$ in the supplementary reward specification. The terms penalize abrupt radius changes and drift from the initial radius. Neither sets a target radius from speed or obstacle distance, and training uses no target-radius tracking reward. The regularizer encodes a preference for the initial radius, while allowing task rewards to favor a different radius when beneficial; it does not prescribe a speed-to-radius rule.
+where $\lambda_s=\lambda_r=0.1$ during training. Thus, the combined radius-related contribution to the total reward is $-0.1|r_t-r_{t-1}|-0.1(r_t-r_{\mathrm{init}})^2$. Both contributions are removed in the reward ablation, while the radius remains in the observation and action spaces and all other reward terms are retained. The terms penalize abrupt radius changes and drift from the initial radius. Neither sets a target radius from speed or obstacle distance, and training uses no target-radius tracking reward. The regularizer encodes a preference for the initial radius, while allowing task rewards to favor a different radius when beneficial; it does not prescribe a speed-to-radius rule.
 
 Our interpretation is that radius actions affect locomotion indirectly through future perception, which may be harder to learn than direct motor actions. Without regularization, early radius oscillation or drift can make observations less consistent; higher speeds may increase sensitivity to unsuitable or unstable sensing ranges. This is an interpretation of the ablation, not a separate causal measurement of either reward term.
-\Changes Sec.~III-B-3 (Reward Functions) describes the two regularizers and clarifies that no target radius is prescribed. Sec.~IV-B-4 (Ablation Study on Adaptive Mechanism) states that the reward ablation removes both terms and interprets the high-speed result. The exact terms and weights appear in the supplementary source, Sec.~Training Details, Reward Function Details. \textit{This supplementary section must be included in the submitted materials; it is currently commented out in the manuscript's main source.}
+\Changes Sec.~III-B-3 (Reward Functions), the Active Perception item, describes the smoothness and initial-radius deviation penalties. The exact formulas and the clarification that no speed- or obstacle-dependent target radius is prescribed are provided in this response. Sec.~IV-B-4 (Ablation Study on Adaptive Mechanism) states that the reward ablation removes both terms and interprets the high-speed result. The exact formulas and training weights are given directly above.
+\Location{Sec.~III-B-3, Active Perception item; and Sec.~IV-B-4, the definition of w/o Adaptive Reward and the paragraph interpreting its high-speed performance. The detailed formulas and weights are supplied directly in this response.}
+
+
 
 \subsection*{Reviewer 8, Comment 6: Actor inputs and recurrence}
 \begin{reviewcomment}
 Fig. 1 makes it look like the actor also receives the privileged states, which contradicts what is claimed by the text in Sec. III-C. I also think Fig. 1 could be more informative if it showed the recurrent nature of the actor.
 \end{reviewcomment}
-\Response Thank you for identifying the diagram error. We revised Fig.~1 so that the actor receives only deployable observations while the separate critic receives the additional privileged elevation map. The figure now shows independent actor and critic LSTM hidden-state loops.
-\Changes Fig.~1 in Sec.~III-B-1 (Observation Space) and Sec.~III-C (Training Architecture) now distinguish the inputs and recurrent states of the actor and critic. The supplementary Policy Network Structure table also identifies the recurrent units as LSTMs.
+\Response Thank you for identifying the diagram error. We revised Fig.~1 so that the actor receives only deployable observations while the separate critic receives the additional privileged elevation map. The figure now shows independent actor and critic LSTM hidden-state loops. Each branch uses an LSTM with a hidden dimension of 256, followed by an MLP with hidden dimensions $[128,64,32]$ and ELU activations. The horizontal-map MLP encoder has hidden dimensions $[256,128,64]$, and the vertical-map MLP encoder has hidden dimensions $[128,64]$; both use CELU activations and produce 32-dimensional embeddings. The two map embeddings form a 64-dimensional environmental representation. The actor and critic maintain separate recurrent states, and the privileged ground-truth elevation map is supplied only to the critic.
+\Changes Fig.~1 in Sec.~III-B-1 (Observation Space) and Sec.~III-C (Training Architecture) now distinguish the inputs and recurrent states of the actor and critic.
+\Location{Fig.~1 (introduced in Sec.~III-B-1); Sec.~III-B-1, the paragraph beginning \textit{The critic operates on a privileged observation space}; and Sec.~III-C, the actor/critic and encoder descriptions. Layer dimensions and activation functions are detailed in this response.}
+
+
 
 \subsection*{Reviewer 8, Comment 7: Uncertainty in Fig. 5}
 \begin{reviewcomment}
 Fig. 5 only shows the average success rates, it would be better to show also confidence intervals/variance. The plot as it is does not give information on how much performance varies across seeds.
 \end{reviewcomment}
-\Response We agree that average success rates alone do not show the uncertainty of the evaluation. We have added approximate 95\% Wilson confidence intervals to Fig.~5 for both simulation and real-world success rates. For each terrain and domain, the figure pools 30 binary trial outcomes (ten at each of three command speeds) under varying evaluation environment seeds. The error bars therefore make the uncertainty in the reported success rates visible. All trials use a fixed policy checkpoint; the intervals describe variation in evaluation outcomes and are not estimates of variation across independently trained policies.
-\Changes Fig.~5 and its caption in Sec.~IV-C-2 (Results) now show the intervals and specify their Wilson calculation, 30 trials per terrain and domain, three command speeds, and fixed checkpoint. The plotted values and intervals are generated from the trial data by the revised figure script.
+\Response We agree that average success rates alone do not show the uncertainty of the evaluation. We have added approximate 95\% Wilson confidence intervals to Fig.~5 for both simulation and real-world success rates. The simulation results in Fig.~5 come from a separate evaluation with single-obstacle configurations matched to the real-world scenes, rather than the five-obstacle tracks used in Table~III. A trial is successful if the robot traverses the single obstacle. For each terrain and domain, the figure pools 30 binary trial outcomes (ten at each of three command speeds). The real-world results are repeated trials with the same fixed obstacle configuration for each terrain; the corresponding simulation evaluation uses the matched configuration. The error bars therefore make the uncertainty in the reported success rates visible.
+\Changes Fig.~5 and its caption in Sec.~IV-C-2 (Results) now show the intervals and specify their Wilson calculation, 30 trials per terrain and domain, three command speeds, a fixed checkpoint, and the single-obstacle evaluation matched to the real-world scenes. Sec.~IV-C-1 (Deployment) states the fixed real-world obstacle configurations and 30 trials per terrain; the per-speed trial count and binary single-obstacle outcome are specified in the Fig.~5 caption.
+\Location{Fig.~5 and its caption in Sec.~IV-C-2 (Results), which define the binary single-obstacle outcome, matched scenes, fixed checkpoint, 30 trials, and Wilson intervals. Sec.~IV-C-1 describes the fixed real-world obstacle configurations and three speed commands.}
+
+
 \end{document}
