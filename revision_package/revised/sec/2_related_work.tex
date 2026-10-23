@@ -1,0 +1,59 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related Works}
+\subsection{Perception for Legged Locomotion}
+\label{sec:RELATED WORKS}
+% 总述相关工作：先指出感知表示的共同矛盾，为后文分类讨论做铺垫。
+Table~\ref{table:comparison_method} compares elevation, image/depth, and volumetric or point-based representations in terms of geometry, input size, and sensing adaptation.
+
+\begin{table}[ht]
+    \centering
+    % \vspace{-5pt}
+    \caption{ADAPT comparison with existing works. Sensory dimension counts the per-frame perceptual input elements before encoding, excluding proprioception, observation history, and critic-only privileged inputs.}
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{lccccc}
+    \toprule 
+    \multirow{2}{*}{Method} & \multirow{2}{*}{\shortstack{Perceptual\\Representation}} & \multirow{2}{*}{\shortstack{Native\\Sampling}} & \multirow{2}{*}{\shortstack{Sensory\\Dimension}} & \multirow{2}{*}{\shortstack{Overhead}} & \multirow{2}{*}{\shortstack{Adaptive\\Sensing}} \\ \\
+    \midrule
+    PIM~\cite{long2025learning} & Elevation Map & 0.10 m & 96 & \XSolidBrush & \XSolidBrush \\
+    Beamdojo~\cite{wang2025beamdojo} & Elevation Map & 0.10 m & 225 & \XSolidBrush & \XSolidBrush \\
+    Vb-com~\cite{ren2025vb} & Elevation Map & 0.10 m & 225 & \XSolidBrush & \XSolidBrush \\ 
+    Parkour~\cite{zhuang2024humanoid} & Depth Image & 48$\times$64 px & 3072 & \Checkmark & \XSolidBrush \\ 
+    Omni~\cite{Wang_2025_Omni-Perception} & Point Cloud & 0.05$\pi$ rad & 251 & \Checkmark & \XSolidBrush \\ 
+    Gallant~\cite{Ben_2025_Gallant} & Voxel Grid & 0.05 m & 40960 & \Checkmark & \XSolidBrush \\
+    HumanoidPF~\cite{Xue_2026_Collision-FreeHumanoidTraversal} & Joint Position & 39 dims & 39 & \Checkmark & \XSolidBrush \\
+    \cmidrule(r){1-6}
+    \ourshort{} (ours) & Dual Projection & \textbf{0.025$\pi$ rad} & \textbf{578} & \Checkmark & \Checkmark \\
+    \bottomrule
+    \end{tabular}}
+    \label{table:comparison_method}
+    % \vspace{-10pt}
+\end{table}
+
+% 第一种方法（高程图）：优点：高效落脚，缺点：缺少垂直空间约束。
+Elevation maps~\cite{Fankhauser2014RobotCentricElevationMapping,Fankhauser2018ProbabilisticTerrainMapping,long2025learning,wang2025beamdojo,ren2025vb,he2025attention,Zhang_2026_AME2} provide efficient 2.5D grids for foothold reasoning. However, their height-field assumption inherently discards vertical structures like overhangs and side walls, missing the body-level clearance constraints crucial for humanoid traversal in 3D clutter.
+
+% 第二种方法（深度和视觉）：优点：信息直接 缺点：不够结构化，学习和部署都更困难。
+Depth and vision-based methods~\cite{zhuang2024humanoidRobot,Li_2024_MOVE,zhuang2024humanoid,Yu_2025_START,Castillo_2025_LearningTerrainAwareBipedalLocomotion,Sun_2025_DPL,Wang_2025_LocoMamba,zhu2026hiking} offer richer scene observations for agile locomotion. Yet, their unstructured inputs heavily burden the learning system and are susceptible to occlusions, viewpoint shifts, and illumination changes. While reduced visual encodings mitigate this, they tend to entangle ground geometry with visual noise rather than explicitly separating the needed spatial constraints.
+
+
+% 第三种方法（体素和点云）：优点：强调3D语义更完整，缺点：维度、延迟和训练效率。
+Volumetric, point-cloud and multi-plane representations aim to recover more complete 3D spatial awareness~\cite{Multi-Layer_ElevationMap_2025,Ben_2025_Gallant,Niijima_2025_Real-timeMulti-PlaneSegmentation,Wang_2025_Omni-Perception,Xue_2026_Collision-FreeHumanoidTraversal}. These methods are better suited to collision avoidance and constrained-space traversal because they can encode obstacles beyond the terrain surface. Their main drawback is the cost of maintaining and processing dense 3D structure. Voxel grids scale cubically with resolution and incur high memory traffic~\cite{2020arXiv200716100T}, leading to severe inference latency (e.g., $4.4$\,Hz in~\cite{2018arXiv181205784L}) that fails the $\ge 10$\,Hz requirement for closed-loop control~\cite{2022arXiv220108117M} and inflated training iteration times (e.g., $>22$\,s/iter in~\cite{Ben_2025_Gallant}). Point-based representations require careful sampling and aggregation to remain stable for policy learning. Multi-plane methods mitigate the cubic cost but leave vertical clearance implicit, forcing the policy to infer the gap between an overhead obstacle and the supporting ground across plane indices rather than from a direct distance measurement. The increased latency and observation dimensionality can slow training and reduce the responsiveness needed for high-speed humanoid motion.
+
+% 最后总结ADAPT的表示方式：在2.5D效率和3D通行语义之间建立中间表示。
+ADAPT bridges these approaches with two compact projections that explicitly separate ground support from body-level clearance without encoding the full local volume.
+
+\subsection{Adaptive Perception and Behavior Modulation}
+% 提出需求：不同运动阶段需要不同感知范围，固定感知会造成信息不足或资源浪费。
+The need for adaptive perception arises from the non-uniform information demand of locomotion: fast traversal requires a long perceptual horizon to anticipate obstacles, whereas cluttered traversal benefits more from high-resolution local geometry. A fixed sensing range cannot satisfy both simultaneously.
+
+
+% 第一种方法（特征和地图层面的自适应）：优点：能提高信息利用效率，缺点：感知范围和尺度通常仍是预设的。
+Spatial attention and foveation methods select informative regions or suppress irrelevant visual content~\cite{Wang_2025_AdaptiveVision,Zhang_2026_FocusNav}, while multi-range mapping assigns different densities to nearby and distant regions~\cite{Patel_2024_RoadRunnerMM}. However, these mechanisms adapt perception after the sensing structure has been specified; the spatial extent and resolution levels remain fixed by design rather than continuously selected by the policy.
+
+% 第二种方法（任务和运动层面的自适应）：优点：能让感知或动作依赖任务，缺点：缺少感知尺度与运动策略的闭环。
+Active perception mechanisms change the sensing focus or viewpoint according to task context~\cite{Liu_2026_ActiveVLA}, and perceptive locomotion methods adapt gait and footholds based on terrain observations~\cite{zhuang2024humanoid,long2025learning,wang2025beamdojo,ren2025vb}. Nevertheless, perception is typically organized as an upstream module with a fixed range, and the downstream policy adapts actions to those observations. The missing component is a feedback path in which the same policy that generates motion also regulates the amount of spatial information it receives.
+
+% 本文引出：ADAPT不是改变传感器视角，而是让策略控制感知范围，使感知尺度和运动策略在闭环中共同优化。
+ADAPT closes this feedback loop by making only the vertical map's sensing radius a policy action and including the previous radius in the observation. The horizontal map retains fixed coverage and resolution. Reinforcement learning jointly adapts locomotion and sensing range without changing the sensor pose.
+
+% This mechanism allows the system to optimize the signal-to-noise ratio autonomously. Consequently, the policy ensures safe negotiation of hazardous terrain and ignores irrelevant distal features.

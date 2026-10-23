@@ -1,0 +1,9 @@
+\begin{abstract}
+% 
+% 1.提出问题：复杂3D穿越需要同时理解地面支撑和身体可通行空间，但受高频控制的计算约束限制。
+% 2.分析原因：现有表示要么缺少垂直空间约束，要么计算代价较高；固定感知范围也难以适应运动状态变化。
+% 3.提出方法：ADAPT，通过双投影表示和策略控制的感知半径联合解决表示与感知尺度问题。
+% 4.总结实验：在仿真和真机上验证鲁棒性、效率和迁移能力。
+% 
+Agile humanoid locomotion in complex 3D environments requires reasoning about both ground-support geometry and body-level traversable space under the strict latency constraints of high-frequency control. Existing perceptive locomotion methods often face two coupled limitations: compact 2.5D maps are efficient but miss vertical clearance constraints, whereas dense 3D representations provide richer geometry at higher computational cost; meanwhile, fixed sensing scale cannot adapt to changes in motion speed and local environmental complexity. We propose \textbf{ADAPT} (\textbf{A}daptive \textbf{D}ual-projection \textbf{A}rchitecture for \textbf{P}erceptive \textbf{T}raversal), a perception-control framework that addresses both representation efficiency and sensing-scale adaptation. ADAPT decomposes local 3D geometry into two compact projections: a horizontal elevation map for terrain support and a vertical distance map for body-level clearance. It further treats the sensing radius of the vertical map as a reinforcement learning policy action, enabling the robot to expand its perceptual horizon for long-range anticipation and contract it for higher local resolution in cluttered spaces. Experiments show that ADAPT achieves a 94.75\% success rate across diverse 3D traversal tasks, and reduces the exteroceptive observation input dimensionality by 98.6\% relative to our implementation of the Gallant baseline, while also lowering deployment latency and computational resource usage. The learned policy achieves zero-shot transfer to a Unitree G1 humanoid robot and enables real-world space traversal.
+\end{abstract}

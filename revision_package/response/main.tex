@@ -10,7 +10,7 @@
 \newcommand{\Location}[1]{\par\noindent\textit{Location in the revised manuscript: #1}}
 \begin{document}
 \begin{center}
-{\LARGE\bfseries Statement of Changes and Response to Reviewers}\\[0.8em]
+{\LARGE\bfseries Response Letter}\\[0.8em]
 {\large Manuscript ID: 26-3482}\\[0.35em]
 {\large ADAPT: Adaptive Dual-projection Architecture for Perceptive Traversal}
 \end{center}
@@ -43,11 +43,11 @@ Both reviewers find the problem relevant and well motivated, and recognize the i
 \begin{reviewcomment}
 Authors claim that ADAPT provides a more compact representation and potentially makes reinforcement learning more computationally efficient, compared with voxel-based alternatives. The authors should specify how the comparisons were conducted. They have to provide enough detail to verify both the dimensionality reduction and the training-speed comparison. In particular, R8 asks where the 56\% computational overhead reduction and the 98.6\% observation-dimensionality reduction are supported. R3 notes that Table IV reports only training efficiency, whereas inference efficiency matters more for real-time perceptive control. R3 also asks for latency and onboard resource measurements against the main baselines.
 \end{reviewcomment}
-\Response Thank you for requesting this clarification. We agree that the efficiency metrics should be stated explicitly. The 56\% figure refers to \emph{peak GPU memory during training} relative to the Gallant voxel baseline. With the same GPU, parallel environment count, rollout length, PPO epochs, and batch settings, peak memory is 36,054\,MiB for Gallant and 15,870\,MiB for ADAPT: $(36{,}054-15{,}870)/36{,}054=55.98\%$. The respective iteration times are 34.6\,s and 11.3\,s, so ADAPT takes 32.7\% of Gallant's time under this setup.
+\Response Thank you for requesting this clarification. We agree that the efficiency metrics should be stated explicitly. The 56\% figure refers to \emph{peak GPU memory during training} relative to the Gallant voxel baseline. Using the same modified NVIDIA RTX 4090 GPU with 48 GB of VRAM and identical PPO settings (4,096 parallel environments, a rollout of 24 steps per environment per policy update, 5 PPO epochs per update, and 4 mini-batches per epoch; each rollout batch contains $4{,}096\times24=98{,}304$ transitions), peak memory is 36,054\,MiB for Gallant and 15,870\,MiB for ADAPT: $(36{,}054-15{,}870)/36{,}054=55.98\%$. The respective iteration times are 34.6\,s and 11.3\,s, so ADAPT takes 32.7\% of Gallant's time under this setup.
 
 The 98.6\% figure compares \emph{single-frame external perception inputs before encoding}. Gallant's $32\times32\times40$ voxel grid has 40,960 values; ADAPT's $21\times17$ horizontal elevation and $13\times17$ vertical distance maps have 578 values in total. Thus $(40{,}960-578)/40{,}960=98.59\%$.
 
-To evaluate deployment efficiency, we added measurements of deployment latency and computational resource usage. Table~IV(b) compares ADAPT with the main voxel baseline, Gallant, on the same local computer (Intel i7-12700H CPU and NVIDIA RTX 3060 Laptop GPU). Mean map-construction latency decreases from 64.06 to 41.64\,ms, policy GPU inference latency from 1.91 to 1.40\,ms, and perception-to-command-publication latency from 79.45 to 55.94\,ms (29.6\% lower). Sampled peak GPU memory decreases from 5,711 to 2,373\,MiB (58.4\% lower); mean whole-host CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04\,GiB.
+To evaluate deployment efficiency, we added measurements of deployment latency and computational resource usage. Table~IV(b) compares ADAPT with the main voxel baseline, Gallant, on the same local computer (Intel i7-12700H CPU and NVIDIA RTX 3060 Laptop GPU). This local computer was also used for perception and policy inference in the real-world robot experiments; we have corrected the deployment description in Sec.~IV-A-2. Mean map-construction latency decreases from 64.06 to 41.64\,ms, policy GPU inference latency from 1.91 to 1.40\,ms, and perception-to-command-publication latency from 79.45 to 55.94\,ms (29.6\% lower). Sampled peak GPU memory decreases from 5,711 to 2,373\,MiB (58.4\% lower); mean whole-host CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04\,GiB.
 \Changes
 \begin{itemize}
     \item Sec.~I restates the two efficiency quantities.
@@ -89,7 +89,7 @@ Resolve whether the radius changes the vertical map only or both maps. State whe
 \end{itemize}
 
 
-\Location{Sec.~I, p.~1; Sec.~II-B, p.~2; Sec.~III-B-1, p.~3; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, p.~7; Sec.~IV-C-2 and Fig.~5, p.~7. Tether clarification: response letter only.}
+\Location{Sec.~I, p.~1; Sec.~II-B, p.~2; Sec.~III-B-1, p.~3; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, pp.~6--7; Sec.~IV-C-2 and Fig.~5, p.~7. Tether clarification: response letter only.}
 
 \clearpage
 \section*{Response to Reviewer 3}
@@ -122,7 +122,7 @@ Table III shows that ADAPT outperforms all baselines, including some computation
 \begin{itemize}
     \item Sec.~IV-B-3 now explains that, for the implemented Gallant baseline, fine voxel resolution restricts sensing coverage under a fixed voxel count and computational budget.
     \item The same section describes the smaller performance gap at lower speeds and the abrupt deceleration and occasional loss of balance observed at high speed, explaining how limited look-ahead can hinder smooth speed and posture adjustments.
-    \item The analysis contrasts this fixed coverage with ADAPT's policy-controlled look-ahead distance and explicitly states that voxel representations are not inherently inferior.
+    \item The analysis acknowledges that voxels preserve richer 3D geometry and contrasts the implemented Gallant baseline's fixed sensing coverage with ADAPT's policy-controlled look-ahead distance.
 \end{itemize}
 \Location{Sec.~IV-B-3, p.~5; Table~III, p.~6.}
 
@@ -141,15 +141,15 @@ The real-world experiments provide valuable hardware validation. However, for th
 \begin{reviewcomment}
 Table IV reports training efficiency, but inference efficiency is arguably more important for perceptive locomotion because training is performed offline, whereas perception and control must operate under strict real-time constraints during deployment. The authors are encouraged to report inference-time benchmarks, including map-construction latency, policy inference latency, total perception-to-control latency, and onboard computational resource usage. A comparison of these quantities across ADAPT and the main baselines would better support the paper's efficiency claims.
 \end{reviewcomment}
-\Response Thank you for this suggestion. We have extended Table~IV with runtime measurements for ADAPT and the Gallant voxel baseline and added the measurement setup and analysis in Sec.~IV-C-3. Both methods were deployed and benchmarked on the same local computer with an Intel i7-12700H CPU and an NVIDIA RTX 3060 Laptop GPU with 6 GiB VRAM.
+\Response Thank you for this suggestion. We have extended Table~IV with runtime measurements for ADAPT and the Gallant voxel baseline and added the measurement setup and analysis in Sec.~IV-C-3. Both methods were deployed and benchmarked on the same local computer with an Intel i7-12700H CPU and an NVIDIA RTX 3060 Laptop GPU with 6 GiB VRAM. Both the real-world robot experiments and the latency and resource-usage benchmarks used this local-computer deployment setup. Perception and policy inference ran on the local computer, which generated and sent joint-angle targets to the robot at 50 Hz. No Jetson Orin NX was used in either set of experiments. We have corrected the original deployment description in Sec.~IV-A-2 and clarified the shared setup in Sec.~IV-C-3. Table~IV(b) reports latency and resource usage on the local computer used for deployment.
 
 Each method was tested five times on each of three terrain categories: flat ground, a single obstacle, and a complex environment, for 15 trials per method. Latency entries are equal-weight averages of per-trial means and P95s. Map latency spans the input callback to the first observed map-ready event; perception-to-publish latency spans that callback to the first command-publication call using the update. Policy GPU inference latency is measured with current-stream CUDA events. For ADAPT, each map-latency and perception-to-publish entry reports the larger statistic of its two map streams. CPU utilization and RAM usage are whole-host averages, and peak VRAM is the maximum sampled usage.
 
 Relative to Gallant, ADAPT reduces mean map latency from 64.06 to 41.64 ms and mean perception-to-publish latency from 79.45 to 55.94 ms, a 29.6\% reduction for the latter. Mean policy GPU inference latency decreases from 1.91 to 1.40 ms, and sampled peak VRAM decreases from 5,711 to 2,373 MiB (58.4\% lower). Mean CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04 GiB.
-\Changes Table~IV(b) and Sec.~IV-C-3 report the local-computer runtime comparison, measurement boundaries, hardware, and trial setup.
+\Changes Sec.~IV-A-2 now states that real-world perception and policy inference run on the local computer, which sends joint-angle targets to the robot at 50 Hz. Table~IV(b) and Sec.~IV-C-3 report the runtime comparison on the same deployment computer, measurement boundaries, hardware, and trial setup.
 
 
-\Location{Abstract and Sec.~I, p.~1; Table~IV(b), p.~6; Sec.~IV-C-3, p.~7.}
+\Location{Abstract and Sec.~I, p.~1; Sec.~IV-A-2, p.~5; Table~IV(b), p.~6; Sec.~IV-C-3, p.~7.}
 
 \clearpage
 \section*{Response to Reviewer 8}
@@ -174,7 +174,7 @@ There is a possible typo in the introduction: 3-D negotiation tasks, you mean 3-
 \begin{reviewcomment}
 In the introduction, you claim that the adaptive sensing mechanism is responsible for reducing the computational overhead by 56\%. Where in the experiment section do you support this claim? The same question holds for the 98.6\% reduction in observation dimensionality with respect to voxel-based methods that is claimed in the abstract. I think this comparison could be more clearly stated.
 \end{reviewcomment}
-\Response Thank you for pointing this out. We agree that the original comparison was imprecise. The 56\% result is the reduction in training \emph{peak GPU memory} relative to Gallant: $(36{,}054-15{,}870)/36{,}054=55.98\%$, with values in MiB. Under the stated common GPU and PPO settings, iteration time is 34.6\,s for Gallant and 11.3\,s for ADAPT; ADAPT takes 32.7\% of the baseline's time. These results compare the implemented representation and encoder pipelines, not the isolated effect of adaptive-radius selection.
+\Response Thank you for pointing this out. We agree that the original comparison was imprecise. The 56\% result is the reduction in training \emph{peak GPU memory} relative to Gallant: $(36{,}054-15{,}870)/36{,}054=55.98\%$, with values in MiB. Using the same modified NVIDIA RTX 4090 GPU with 48 GB of VRAM and common PPO settings (4,096 parallel environments, a rollout of 24 steps per environment per policy update, 5 PPO epochs per update, and 4 mini-batches per epoch; each rollout batch contains $4{,}096\times24=98{,}304$ transitions), iteration time is 34.6\,s for Gallant and 11.3\,s for ADAPT; ADAPT takes 32.7\% of the baseline's time. These results compare the implemented representation and encoder pipelines, not the isolated effect of adaptive-radius selection.
 
 The 98.6\% result compares only single-frame perception inputs \emph{before encoding}: $32\times32\times40=40{,}960$ voxel values for Gallant versus $21\times17+13\times17=578$ map values for ADAPT, giving $(40{,}960-578)/40{,}960=98.59\%$. It does not compare total actor observations.
 \Changes
@@ -213,7 +213,7 @@ Was the ablation study on the adaptive radius mechanism done in simulation or in
     \item The same section clarifies that each trial contains five obstacles and that success is the fraction of obstacles crossed, with statistics pooled across the three terrains at each speed.
     \item We removed the Table~V comparison from Sec.~IV-C-1, which covers hardware tests.
 \end{itemize}
-\Location{Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, p.~7.}
+\Location{Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, pp.~6--7.}
 
 
 
@@ -259,7 +259,7 @@ Fig. 5 only shows the average success rates, it would be better to show also con
     \item Sec.~IV-C-1 specifies ten independent training seeds, final-checkpoint selection, and the common evaluation protocol: one trial per policy at each of three speeds, for 30 trials per terrain and domain.
     \item Fig.~5 and its caption in Sec.~IV-C-2 now report the mean and sample standard deviation across the ten policy-level success rates and specify single-obstacle evaluation in matched simulation and real-world scenes.
 \end{itemize}
-\Location{Secs.~IV-C-1--IV-C-2 and Fig.~5, p.~7.}
+\Location{Secs.~IV-C-1--IV-C-2, pp.~6--7; Fig.~5, p.~7.}
 
 
 \end{document}

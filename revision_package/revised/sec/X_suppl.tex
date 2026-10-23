@@ -1,0 +1,235 @@
+\clearpage
+\appendix
+\section{Training Details}
+
+\subsection{PPO Hyperparameters}
+The control policy was optimized via the Proximal Policy Optimization (PPO) algorithm. The hyperparameters governing the training process are enumerated in Table~\ref{tab:ppo_params}.
+
+\begin{table}[h!]
+\centering
+\caption{PPO Hyperparameters}
+\label{tab:ppo_params}
+\begin{tabular}{lc}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Number of environments & 4096 \\
+Number of steps per policy update & 24 \\
+PPO epochs & 5 \\
+Number of mini-batches & 4 \\
+PPO clip parameter ($\epsilon$) & 0.2 \\
+Value function clip parameter & 0.2 \\
+GAE discount factor ($\lambda$) & 0.95 \\
+Reward discount factor ($\gamma$) & 0.99 \\
+Learning rate & 5e-4 \\
+Entropy coefficient & 0.0 \\
+Desired KL divergence & 0.01 \\
+Max gradient norm & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Policy Network Structure}
+We utilize a recurrent actor-critic architecture with separate Long Short-Term Memory (LSTM) networks for the actor and critic to handle temporal dependencies. The specific architectural configurations for the perceptual encoders and the recurrent policy layers are provided in Table~\ref{tab:network_structure}.
+
+\begin{table}[h!]
+\centering
+\caption{Policy Network Structure}
+\label{tab:network_structure}
+\begin{tabular}{l|l|c}
+\toprule
+\multicolumn{2}{l|}{\textbf{Component}} & \textbf{Specification} \\
+\midrule
+\multirow{4}{*}{Recurrent Policy} & RNN Type & LSTM \\
+                           & RNN Hidden Dims & 256 \\
+                           & Actor MLP Hidden Dims & [128, 64, 32] \\
+                           & Critic MLP Hidden Dims & [128, 64, 32] \\
+                           & Activation Function & ELU \\
+\midrule
+\multirow{3}{*}{Horizontal Map Encoder} & Encoder Type & MLP \\
+                                 & MLP Hidden Dims & [256, 128, 64] \\
+                                 & Activation Function & CELU \\
+                                 & Output Embedding Dims & 32 \\
+\midrule
+\multirow{3}{*}{Vertical Map Encoder} & Encoder Type & MLP \\
+                                 & MLP Hidden Dims & [128, 64] \\
+                                 & Activation Function & CELU \\
+                                 & Output Embedding Dims & 32 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Domain Randomization}
+To facilitate robust simulation-to-reality transfer, we introduce stochastic variations across physical properties and sensor readings during training. The parameters and their respective randomization intervals are detailed in Table~\ref{tab:dr_params}.
+
+\begin{table}[h!]
+\centering
+\caption{Parameters and Ranges for Domain Randomization}
+\label{tab:dr_params}
+\begin{tabular}{lc}
+\toprule
+\textbf{Parameter} & \textbf{Range (Uniform)} \\
+\midrule
+\multicolumn{2}{c}{Dynamics Randomization} \\
+Robot Base Mass (kg) & [-1.0, 3.0] \\
+Motor Strength Scale & [0.8, 1.2] \\
+Ground Friction Coefficient & [0.1, 1.25] \\
+\midrule
+\multicolumn{2}{c}{External Perturbations} \\
+Push Interval (s) & 5 \\
+Max Push Velocity (m/s) & 1.5 \\
+\midrule
+\multicolumn{2}{c}{Sensor Randomization} \\
+Proprioception Latency (s) & [0.005, 0.045] \\
+Point Cloud Dropout & 10\% of points \\
+LiDAR Point Noise & [-0.05, 0.05] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Reward Function Details}
+The composite reward signal is a weighted summation of the components formulated in the primary text. The total reward at timestep $t$ is given by $r_t = \sum_i w_i \, r_i(t)$, where $w_i$ and $r_i(t)$ denote the weight and instantaneous value of the $i$-th term. Below we provide the mathematical formulation and motivation for each component, organized by functional category.
+
+\subsubsection*{Task Fulfillment}
+\begin{itemize}
+    \item \textbf{Linear Velocity Tracking} ($w = 2.0$):
+    \begin{equation}
+        r_{\text{lin}} = \exp\!\big(-\|\mathbf{v}_{t} - \mathbf{c}_{t,\text{lin}}\|^2\big)
+    \end{equation}
+    Rewards close alignment of the robot's base linear velocity $\mathbf{v}_t$ with the commanded target $\mathbf{c}_{t,\text{lin}}$. The exponential form provides smooth gradients near the optimum.
+    \item \textbf{Angular Velocity Tracking} ($w = 0.5$):
+    \begin{equation}
+        r_{\text{ang}} = \exp\!\big(-\|\omega_{z,t} - c_{t,\text{yaw}}\|^2\big)
+    \end{equation}
+    Rewards precise tracking of the commanded yaw rate $c_{t,\text{yaw}}$ using the robot's current angular velocity about the vertical axis $\omega_{z,t}$.
+\end{itemize}
+
+\subsubsection*{Locomotion Stability}
+\begin{itemize}
+    \item \textbf{Base Orientation} ($w = -1.0$):
+    \begin{equation}
+        r_{\text{orient}} = -\|\mathbf{g}_{t,xy}\|^2
+    \end{equation}
+    Penalizes deviations of the projected gravity vector $\mathbf{g}_{t,xy}$ from the vertical, encouraging the robot to maintain an upright posture and preventing excessive roll or pitch.
+    \item \textbf{Base Angular Velocity XY} ($w = -0.3$):
+    \begin{equation}
+        r_{\text{ang\_vel\_xy}} = -\|\boldsymbol{\omega}_{t,xy}\|^2
+    \end{equation}
+    Penalizes rotational motion in the horizontal plane to suppress wobbling and promote stable heading maintenance.
+    \item \textbf{Hip Neutrality} ($w = -1.0$):
+    \begin{equation}
+        r_{\text{hip}} = -\sum_{i \in \mathcal{H}} (q_{t,i} - q_i^{\text{default}})^2
+    \end{equation}
+    Penalizes deviations of hip joints (indexed by $\mathcal{H}$) from their nominal default positions $q_i^{\text{default}}$, encouraging a compact and balanced stance.
+\end{itemize}
+
+\subsubsection*{Behavior Regularization}
+\begin{itemize}
+    \item \textbf{Joint Velocity} ($w = -1\times10^{-3}$):
+    \begin{equation}
+        r_{\text{dof\_vel}} = -\|\dot{\mathbf{q}}_t\|^2
+    \end{equation}
+    Penalizes high joint velocities to promote smooth, energy-efficient motion.
+    \item \textbf{Joint Acceleration} ($w = -2.5\times10^{-7}$):
+    \begin{equation}
+        r_{\text{dof\_acc}} = -\|\dot{\mathbf{q}}_t - \dot{\mathbf{q}}_{t-1}\|^2 \,/\, \Delta t^2
+    \end{equation}
+    Penalizes large joint accelerations to reduce jerky motion and mechanical stress.
+    \item \textbf{Action Rate} ($w = -0.01$):
+    \begin{equation}
+        r_{\text{action\_rate}} = -\|\mathbf{a}_t - \mathbf{a}_{t-1}\|^2
+    \end{equation}
+    Penalizes high-frequency oscillations in the policy output to ensure smooth and temporally coherent action sequences.
+    \item \textbf{Energy} ($w = -2.5\times10^{-7}$):
+    \begin{equation}
+        r_{\text{energy}} = -\|\boldsymbol{\tau}_t \odot \dot{\mathbf{q}}_t\|^2
+    \end{equation}
+    Penalizes high mechanical power consumption, where $\boldsymbol{\tau}_t$ are joint torques and $\dot{\mathbf{q}}_t$ are joint velocities, with $\odot$ denoting the element-wise product.
+\end{itemize}
+
+\subsubsection*{Safety and Survival}
+\begin{itemize}
+    \item \textbf{Horizontal Feet Collision} ($w = -3.0$):
+    \begin{equation}
+        r_{\text{collision}} = -\sum_{i \in \mathcal{F}} \mathbf{1}\!\big[\|\mathbf{F}_{\text{contact},i,xy}\| > \tau_{\text{thresh}}\big]
+    \end{equation}
+    Penalizes each foot $i \in \mathcal{F}$ whose horizontal contact force magnitude exceeds a threshold $\tau_{\text{thresh}}$, discouraging the robot from kicking or scraping against obstacles.
+    \item \textbf{Mesh Penetration} ($w = -1.0$):
+    \begin{equation}
+        r_{\text{penetrate}} = -\sum_{j} \max(d_{\text{pen},j},\,0)
+    \end{equation}
+    Penalizes the total penetration depth $d_{\text{pen},j}$ of body mesh sample points $j$ into the terrain geometry, preventing the robot from intersecting with environmental obstacles.
+    \item \textbf{Joint Limits} ($w = -5.0$):
+    \begin{equation}
+        r_{\text{limits}} = -\sum_{i} \Big[\max(q_{\text{min},i} - q_{t,i},\,0) + \max(q_{t,i} - q_{\text{max},i},\,0)\Big]
+    \end{equation}
+    Penalizes joint positions $q_{t,i}$ that approach or exceed their physical limits $[q_{\text{min},i},\, q_{\text{max},i}]$, protecting the robot from self-damage.
+    \item \textbf{Alive Bonus} ($w = 0.15$):
+    \begin{equation}
+        r_{\text{alive}} = 1.0
+    \end{equation}
+    Provides a constant positive reward at each timestep to incentivize prolonged survival and discourage early termination.
+    \item \textbf{Foot Air Time} ($w = 5.0$):
+    \begin{equation}
+        r_{\text{air\_time}} = \sum_{i \in \mathcal{F}} \big(t_{\text{air},i} - t_{\text{air}}^{\text{min}}\big)
+    \end{equation}
+    Rewards each foot $i$ for spending time $t_{\text{air},i}$ in the air above a minimum threshold $t_{\text{air}}^{\text{min}}$, encouraging the dynamic stepping behavior necessary for clearing obstacles.
+\end{itemize}
+
+\subsubsection*{Adaptive Perception}
+Only the following two radius regularization terms are used in training. The policy learns radius selection through the task rewards subject to these penalties; no speed- or obstacle-dependent target-radius tracking reward is used. Here, $r_t$ denotes the sensing radius and $r_{\mathrm{init}}$ its initial value. The nonnegative quantities below are multiplied by their negative weights in the total reward.
+\begin{itemize}
+    \item \textbf{Radius Smoothness} ($w = -0.1$):
+    \begin{equation}
+        r_{\text{radius\_smoothness}} = |r_t - r_{t-1}|
+    \end{equation}
+    Penalizes abrupt frame-to-frame variations in the commanded radius to prevent oscillating sensing configurations that could destabilize the exteroceptive input.
+    \item \textbf{Radius Regularization} ($w = -0.1$):
+    \begin{equation}
+        r_{\text{radius\_regularization}} = (r_t - r_{\mathrm{init}})^2
+    \end{equation}
+    Penalizes deviations from the initial radius to constrain radius drift. This introduces a preference for the initial radius, while allowing deviations when their task benefits outweigh the regularization cost.
+\end{itemize}
+
+The adopted weights were determined through iterative tuning to balance the competing objectives of tracking accuracy, locomotion stability, energy efficiency, safety, and perceptual adaptivity. All penalty terms carry negative weights so that maximizing the cumulative sum naturally minimizes undesirable behaviors.
+
+\section{Terrain Parameters}
+
+Table~\ref{tab:terrain_params} lists the parameter ranges for each terrain type in the \textit{BarrierTrack} environment. The $\uparrow$ symbol indicates the parameter value increases as difficulty scales up ($\mathbf{p}_\tau^{\min} < \mathbf{p}_\tau^{\max}$), while the $\downarrow$ symbol indicates the value decreases as the task becomes harder ($\mathbf{p}_\tau^{\min} > \mathbf{p}_\tau^{\max}$).
+
+\begin{table}[h]
+\centering
+\caption{Parameters for generating curriculum training terrains.}
+\label{tab:terrain_params}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Terrain} & \textbf{Param. (m)} & $\mathbf{p}_\tau^{\min}$ & $\mathbf{p}_\tau^{\max}$ \\
+\midrule
+\multirow{2}{*}{\textbf{Beam}} & Clearance Height $\downarrow$ & 1.33 & 1.10 \\
+& Beam Depth $\uparrow$ & 0.20 & 0.20 \\
+\addlinespace
+\multirow{2}{*}{\textbf{Narrow Gate}} & Gate Width $\downarrow$ & 0.80 & 0.45 \\
+& Position Offset $\uparrow$ & 0.00 & 0.60 \\
+\addlinespace
+\multirow{2}{*}{\textbf{Pole}} & Pole Width $\downarrow$ & 0.50 & 0.10 \\
+& Position Offset $\uparrow$ & 0.00 & 0.00 \\
+\addlinespace
+\multirow{2}{*}{\textbf{Stairs}} & Step Height $\uparrow$ & 0.10 & 0.30 \\
+& Step Length $\downarrow$ & 0.50 & 0.30 \\
+\addlinespace
+\multirow{2}{*}{\textbf{Jump}} & Wall Height $\uparrow$ & 0.05 & 0.40 \\
+& Wall Depth $\uparrow$ & 0.10 & 0.30 \\
+\addlinespace
+\multirow{2}{*}{\textbf{Drop}} & Drop Height $\uparrow$ & 0.10 & 0.60 \\
+& Platform Length $\downarrow$ & 0.50 & 0.30 \\
+\addlinespace
+\multirow{2}{*}{\textbf{Hurdle}} & Hurdle Height $\uparrow$ & 0.05 & 0.40 \\
+& Hurdle Depth $\uparrow$ & 0.05 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% \section*{ACKNOWLEDGMENT}
+
+% Thanks to 

@@ -1,0 +1,88 @@
+ADAPT 回复信与红色修订核查
+日期：2026-10-23
+
+核查对象
+旧提交版：/home/sure/workspace/paper_todo/review/paper_before.pdf
+修改版：/home/sure/ADAPT
+合并输出：/home/sure/workspace/paper_todo/ADAPT_Response_and_Revised_Manuscript.pdf
+
+结论
+主要修改声明有对应，未发现合并包正文与当前 ADAPT 源文件不一致。
+不能据此认定所有新增实验声明已获独立证实：目前材料允许核对文本、图表及部分统计，不能证明未提供日志的实际训练和硬件试验过程。
+未修改作者的论文或回复措辞；本次重新生成编译产物，并记录核查结果。
+
+编译与版本核对
+1. 运行 python3 build_revision_pdf.py 成功；19 页，回复信 11 页，正文 8 页。
+2. 重编译前后合并 PDF 每页提取文本一致。
+3. revision_package/revised 中对应的 tex/png/bbl/bib 文件与 ADAPT 工作目录逐字节一致。
+4. 另编译 revised/main_for_diff.pdf 成功。其文本与红色版的差异仅为表格提取顺序，词项及出现次数一致；人工检查 Table IV(b) 的行列对应正确。
+5. 最终回复和红色正文没有未定义引用。正文日志有常规版式警告及 0.84782pt 的 Overfull vbox；检查正文第 6、7 页未见明显遮挡。
+6. 回复信中的页码指论文内部页码：正文 p.1 对应合并 PDF p.12，依此类推；Fig.1/表III–V/Fig.5 分别位于合并 PDF p.14/p.17/p.18。
+
+红色差异基准
+生成脚本使用 Git HEAD 快照与保存的 revised 快照比较，而非直接比较旧 PDF。
+实际比对旧 PDF 与提交快照重建文本后，除投稿页眉页脚、断行、公式提取顺序及旧 bbl 引用问题外，未发现正文实质差异。
+旧提交快照 main.bbl 只有31条且会造成3个未定义引用；它不是旧 PDF 的完整参考文献版本。旧 PDF 确有34条，且参考文献完整文本与新版一致，因此不把这三条标红是正确的。
+Fig.1 和 Fig.5 确实变化，采用整段图注标红；图像内部不逐像素标红。Fig.1 的图注文字本身没改也被染红，表示图片改变，不能理解成图注措辞新增。
+删除内容在红色版中被省略；完整增删见 full_diff.tex。这是当前脚本的既定标记规则。
+
+重点问题一：独立训练 seed 的证据缺口（优先级高）
+位置：回复 R8 Comment 7（合并p.11）；正文 IV-C-1/IV-C-2、Fig.5（合并p.17–18）。
+回复和正文均声称十个独立训练 seed、各取 final checkpoint。
+script/experiment_3/raw_data.csv 只有 algorithm/speed/trial 和地形结果列；simReal.py 把同一 trial 编号解释为跨速度的同一训练 seed。
+统计上，按这一解释先对每个 trial 的三个速度求均值、再对十个均值求样本标准差，14组均值/SD全部可复现。
+但 CSV 和注释本身无法证明十份独立训练确实存在，也没有 checkpoint 对应关系。只有在 trial 真的是独立训练 seed 时，当前“across training seeds”的表述才成立。
+建议保存 seed ID、训练日志、checkpoint路径及评测对应表；若实际只是同一策略的十次评测，应按真实试验设计更正，不能把重复试次称为训练seed。
+
+重点问题二：Drop 重做十次仅见回复声明（优先级高）
+位置：AE Comment 3 和 R3 Comment 4（合并p.4、p.6）。
+回复称降低安全绳张力后，同场景、同策略重复十次且自主恢复。
+回复明确标注“response letter only; no manuscript change”，因此正文没有红色段落并非漏标。
+但已检查的目录中未发现可关联这十次试验的视频或日志。Fig.4 仍为原图；Fig.5 的 Real/Drop 29/30属于另一套评测，不能直接作为同策略十次复测的证据。
+建议提供这组实验记录/补充视频，并在回复中给出对应编号。
+
+重点问题三：具体 PPO 参数未进入正文（优先级中）
+位置：response/main.tex:177、185；ADAPT/sec/4_experiment.tex 的 Performance Comparison 段落。
+回复给出4096并行环境、rollout24、5 PPO epochs、4 mini-batches；Changes 段称 IV-B-3 给出 common training settings。
+正文仅说各方法使用相同的 parallel environments、rollout length、PPO epochs、batch settings，并未列出这些具体数值。
+这是细节层面的对应不充分，不是正文完全没有提训练设置。
+建议把四项数值补到正文；或者回复明确写“具体数值仅在本回复提供”。当前目录也没有训练配置文件可独立核实这些参数。
+
+重点问题四：部署评测仅部分覆盖审稿人的请求（优先级中）
+位置：R3 Comment 5；Table IV(b)、IV-C-3（合并p.17–18）。
+请求包含主要基线、onboard资源、perception-to-control延迟。
+实际新增是 ADAPT/Gallant 两种方法在 i7-12700H+RTX3060 Laptop 本地电脑上的数据，测到 command-publication，未含通信及Jetson实际执行延迟；也未报告Jetson资源。
+回复和正文已坦率说明是local-computer而不是Jetson测量，所以不是数据或红字错配，但属于审稿要求未完全覆盖。
+建议保持这个边界表述；若要声称完整端到端或机载效率，需要另补测量。
+现有目录也未发现这15次/方法runtime试验的原始计时和资源采样日志；目前只能核对表中值与回复一致、百分比算对。
+
+其他限定与表达精度
+- R8 Comment 5：正文确实新增两项半径惩罚的文字描述和一起移除的消融说明。精确公式及0.1权重仅在回复，且已明确标注，故不是漏改。无训练实现可独立验证权重与公式。
+- R8 Comment 6：Fig.1确实把privileged输入独立接入critic，并画出两条LSTM状态回路；III-C对应修改存在。LSTM256、MLP层宽及激活函数仅在回复，已注明。图中的回线从MLP端绕回LSTM，若要严格表示LSTM隐状态，建议从LSTM状态端画出，减少把MLP输出误读为隐状态的可能。
+- R3 Comment 3 / AE Comment 2：已新增Gallant分辨率与覆盖范围的解释，但没有隔离网络容量、优化难度、总训练预算的控制实验。因此这是观察与解释，不是排除所有其他原因的因果证明。
+- R8 Comment 3的Changes把多个段落合称为都说明radial range和sampling interval，略宽泛：III-A和III-C主要说vertical-map radius，具体采样间距在III-B-1/2。核心“只影响垂直地图”对应正确。
+- sec/X_suppl.tex虽有修改，但main.tex注释掉了该输入，不在本次PDF内；回复没有声称已加入该附录。
+
+已确认的回复—修改对应
+AE1 / R8-2：98.6%维度比较、56%训练峰值显存定义、32.7%迭代时间比例，对应摘要、引言、Table I及IV-B-3/Table IV(a)。
+AE1 / R3-5：Table IV(b)与IV-C-3确实新增runtime数值和测量边界；对应红色内容存在。
+AE2 / R3-3：Gallant分辨率—覆盖权衡、高速减速与失衡解释，正文IV-B-3存在。
+AE2 / R8-5：两项radius惩罚、一起去除且保留动作与观测，正文III-B-3/IV-B-4存在。
+AE3 / R8-1：3-D negotiation tasks已删除。
+AE3 / R8-3：只调垂直地图、水平地图固定，I、II-B、III-B有对应修改。
+AE3 / R8-4：Table V明确simulation，IV-C-1中的Table V讨论已移除。
+R8-6：Fig.1和III-C中actor/critic分离与循环状态已修改。
+R8-7：Fig.5确实添加误差棒；均值与旧图一致，新增样本SD与现有CSV吻合，seed来源的限制见上文。
+R3-1/2及总体评价属于致谢，无需对应正文改动。
+
+数字复算
+(40960-578)/40960 = 98.588867% → 98.6%
+(36054-15870)/36054 = 55.982693% → 55.98% / 56.0%
+11.3/34.6 = 32.658960% → 32.7%
+(79.45-55.94)/79.45 = 29.590938% → 29.6%
+(5711-2373)/5711 = 58.448608% → 58.4%
+Table V：按experiment_2 CSV及现有脚本的success换算规则，三个地形各十次、每速度合并30次，15组均值和总体标准差全部匹配。
+Fig.5：按experiment_3 CSV中trial分组，14组均值及样本标准差全部匹配。Table V与Fig.5的标准差口径不同，分别为总体SD和样本SD；正文只对Fig.5明确写sample SD，未形成直接冲突。
+
+后续更正（2026-10-23，用户确认后）
+实机部署和延迟/资源实验均在本地电脑运行，未使用Jetson Orin NX。已修改ADAPT及revised快照的IV-A-2/IV-C-3，并更新AE1及R3-5回复。上文关于Jetson参与部署或需补Jetson资源的讨论不再适用；当前表格反映实际部署电脑的资源。perception-to-publish不含命令发布之后的通信/执行时间这一测量边界仍成立。

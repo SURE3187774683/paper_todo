@@ -1,0 +1,96 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf/ieeeconf}
+
+%\documentclass[a4paper, 10pt, conference]{ieeeconf/ieeeconf}
+
+\IEEEoverridecommandlockouts
+
+% Add UTF-8 support for Unicode characters
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\overrideIEEEmargins                                      % Needed to meet printer requirements.
+
+%In case you encounter the following error:
+%Error 1010 The PDF file may be corrupt (unable to open PDF file) OR
+%Error 1000 An error occurred while parsing a contents stream. Unable to analyze the PDF file.
+%This is a known problem with pdfLaTeX conversion filter. The file cannot be opened with acrobat reader
+%Please use one of the alternatives below to circumvent this error by uncommenting one or the other
+%\pdfobjcompresslevel=0
+%\pdfminorversion=4
+
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+% The following packages can be found on http:\\www.ctan.org
+%\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+%\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{balance}  % for balancing columns on the last page
+% \usepackage[numbers,sort&compress]{natbib}  % for \citep citation style
+\usepackage{graphicx}  % for \resizebox and graphics
+\usepackage{booktabs}  % for professional table lines (\toprule, \midrule, \bottomrule)
+\usepackage{multirow}  % for multi-row cells in tables
+\usepackage{pifont}    % for special symbols like checkmark and X
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage[capitalise,noabbrev]{cleveref}
+% \captionsetup[table]{labelsep=space, justification=centering, singlelinecheck=off}
+% Define our method's short name
+\newcommand{\ourshort}{ADAPT}
+% Define checkmark and X symbols for tables
+\newcommand{\XSolidBrush}{\ding{55}}
+\newcommand{\Checkmark}{\ding{51}}
+\newcommand{\ci}[1]{\tiny{\textcolor{gray}{~($\pm #1$)}}}
+\title{\LARGE \bf
+ADAPT: Adaptive Dual-projection Architecture for Perceptive Traversal 
+}
+
+
+% \author{Shuo Shao$^{1*}$, Tianchen Huang$^{2*}$, Yu Wang, Wei Gao$^{1}$\textsuperscript{\textdagger}, Junlin Xiong and Shiwu Zhang$^{1}$\textsuperscript{\textdagger}
+% \thanks{* denotes equal contribution}%
+% \thanks{\textdagger \ denotes the corresponding author}%
+% \thanks{Shuo Shao and Junlin Xiong are with the Department of Automation, University of Science and Technology of China, Anhui 230026, China. {\tt\footnotesize sure318@mail.ustc.edu.cn}}
+% \thanks{Tianchen Huang, Yu Wang, Wei Gao and Shiwu Zhang are with the Institute of Humanoid Robots, Department of Precision Machinery and Precision Instrumentation, University of Science and Technology of China, Hefei, Anhui 230026, China. {\tt\footnotesize weigao@ustc.edu.cn}}%
+% }
+
+% \author{Shuo Shao$^{1*}$, Tianchen Huang$^{2*}$, Wei Gao$^{1}$\textsuperscript{\textdagger} and Shiwu Zhang$^{1}$\textsuperscript{\textdagger}
+% \thanks{* denotes equal contribution}%
+% \thanks{\textdagger \ denotes the corresponding author}%
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{sec/0_abstract}    
+\input{sec/1_intro}
+\input{sec/2_related_work}
+\input{sec/3_method}
+\input{sec/4_experiment}
+\input{sec/5_conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{sec/6_references}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \input{sec/X_suppl}
+
+\end{document}

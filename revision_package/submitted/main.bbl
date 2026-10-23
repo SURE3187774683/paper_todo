@@ -1,0 +1,188 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{#1}
+\csname url@rmstyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand\BIBentrySTDinterwordspacing{\spaceskip=0pt\relax}
+\providecommand\BIBentryALTinterwordstretchfactor{4}
+\providecommand\BIBentryALTinterwordspacing{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand\BIBforeignlanguage[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+
+\bibitem{long2025learning}
+J.~Long, J.~Ren, M.~Shi, Z.~Wang, T.~Huang, P.~Luo, and J.~Pang, ``Learning
+  humanoid locomotion with perceptive internal model,'' in \emph{2025 IEEE
+  International Conference on Robotics and Automation (ICRA)}.\hskip 1em plus
+  0.5em minus 0.4em\relax IEEE, 2025, pp. 9997--10\,003.
+
+\bibitem{wang2025beamdojo}
+H.~Wang, Z.~Wang, J.~Ren, Q.~Ben, T.~Huang, W.~Zhang, and J.~Pang, ``Beamdojo:
+  Learning agile humanoid locomotion on sparse footholds,'' \emph{arXiv
+  preprint arXiv:2502.10363}, 2025.
+
+\bibitem{ren2025vb}
+J.~Ren, T.~Huang, H.~Wang, Z.~Wang, Q.~Ben, J.~Long, Y.~Yang, J.~Pang, and
+  P.~Luo, ``Vb-com: Learning vision-blind composite humanoid locomotion against
+  deficient perception,'' \emph{arXiv preprint arXiv:2502.14814}, 2025.
+
+\bibitem{he2025attention}
+J.~He, C.~Zhang, F.~Jenelten, R.~Grandia, M.~B{\"a}cher, and M.~Hutter,
+  ``Attention-based map encoding for learning generalized legged locomotion,''
+  \emph{Science Robotics}, vol.~10, no. 105, p. eadv3604, 2025.
+
+\bibitem{videomimic}
+A.~Allshire, H.~Choi, J.~Zhang, D.~McAllister, A.~Zhang, C.~M. Kim, T.~Darrell,
+  P.~Abbeel, J.~Malik, and A.~Kanazawa, ``Visual imitation enables contextual
+  humanoid control,'' \emph{arXiv preprint arXiv:2505.03729}, 2025.
+
+\bibitem{Multi-Layer_ElevationMap_2025}
+Y.~{Chen}, J.~{Ma}, Z.~{Luo}, Y.~{Han}, Y.~{Dong}, B.~{Xu}, and P.~{Lu},
+  ``{Learning Autonomous and Safe Quadruped Traversal of Complex Terrains Using
+  Multi-Layer Elevation Maps},'' \emph{IEEE Robotics and Automation Letters},
+  vol.~10, no.~10, pp. 9606--9613, Jan. 2025.
+
+\bibitem{Roth_2025_LearnedPerceptiveForwardDynamicsModel}
+P.~{Roth}, J.~{Frey}, C.~{Cadena}, and M.~{Hutter}, ``{Learned Perceptive
+  Forward Dynamics Model for Safe and Platform-aware Robotic Navigation},''
+  \emph{arXiv e-prints}, p. arXiv:2504.19322, Apr. 2025.
+
+\bibitem{Zhang_2026_AME2}
+C.~{Zhang}, V.~{Klemm}, F.~{Yang}, and M.~{Hutter}, ``{AME-2: Agile and
+  Generalized Legged Locomotion via Attention-Based Neural Map Encoding},''
+  \emph{arXiv e-prints}, p. arXiv:2601.08485, Jan. 2026.
+
+\bibitem{ElevationMap_GPU_2022}
+T.~{Miki}, L.~{Wellhausen}, R.~{Grandia}, F.~{Jenelten}, T.~{Homberger}, and
+  M.~{Hutter}, ``{Elevation Mapping for Locomotion and Navigation using GPU},''
+  \emph{arXiv e-prints}, p. arXiv:2204.12876, Apr. 2022.
+
+\bibitem{Fankhauser2018ProbabilisticTerrainMapping}
+P.~Fankhauser, M.~Bloesch, and M.~Hutter, ``Probabilistic terrain mapping for
+  mobile robots with uncertain localization,'' \emph{IEEE Robotics and
+  Automation Letters (RA-L)}, vol.~3, no.~4, pp. 3019--3026, 2018.
+
+\bibitem{Fankhauser2014RobotCentricElevationMapping}
+P.~Fankhauser, M.~Bloesch, C.~Gehring, M.~Hutter, and R.~Siegwart,
+  ``Robot-centric elevation mapping with uncertainty estimates,'' in
+  \emph{International Conference on Climbing and Walking Robots (CLAWAR)},
+  2014.
+
+\bibitem{zhuang2024humanoidRobot}
+Z.~Zhuang, Z.~Fu, J.~Wang, C.~G. Atkeson, S.~Schwertfeger, C.~Finn, and
+  H.~Zhao, ``Robot parkour learning,'' \emph{arXiv preprint arXiv:2309.05665},
+  2024.
+
+\bibitem{zhuang2024humanoid}
+Z.~Zhuang, S.~Yao, and H.~Zhao, ``Humanoid parkour learning,'' \emph{arXiv
+  preprint arXiv:2406.10759}, 2024.
+
+\bibitem{zhu2026hiking}
+S.~{Zhu}, Z.~{Zhuang}, M.~{Zhao}, K.-Y. {Lee}, and H.~{Zhao}, ``{Hiking in the
+  Wild: A Scalable Perceptive Parkour Framework for Humanoids},'' \emph{arXiv
+  e-prints}, p. arXiv:2601.07718, Jan. 2026.
+
+\bibitem{Yu_2025_START}
+R.~{Yu}, Q.~{Wang}, H.~{Li}, Z.~{Jun}, Z.~{Wang}, J.~{Wu}, and Q.~{Zhu},
+  ``{START: Traversing Sparse Footholds with Terrain Reconstruction},''
+  \emph{arXiv e-prints}, p. arXiv:2512.13153, Dec. 2025.
+
+\bibitem{Castillo_2025_LearningTerrainAwareBipedalLocomotion}
+G.~A. {Castillo}, H.~{Lodha}, and A.~{Hereid}, ``{Learning Terrain Aware
+  Bipedal Locomotion via Reduced Dimensional Perceptual Representations},''
+  \emph{arXiv e-prints}, p. arXiv:2512.12993, Dec. 2025.
+
+\bibitem{Solano_2025_StandWalkNavigate}
+J.~{Solano} and D.~{Quiroz}, ``{Stand, Walk, Navigate: Recovery-Aware Visual
+  Navigation on a Low-Cost Wheeled Quadruped},'' \emph{arXiv e-prints}, p.
+  arXiv:2510.23902, Oct. 2025.
+
+\bibitem{Sun_2025_DPL}
+J.~{Sun}, G.~{Han}, P.~{Sun}, W.~{Zhao}, J.~{Cao}, J.~{Wang}, Y.~{Guo}, and
+  Q.~{Zhang}, ``{DPL: Depth-only Perceptive Humanoid Locomotion via Realistic
+  Depth Synthesis and Cross-Attention Terrain Reconstruction},'' \emph{arXiv
+  e-prints}, p. arXiv:2510.07152, Oct. 2025.
+
+\bibitem{Wang_2025_LocoMamba}
+Y.~{Wang} and G.~{Tao}, ``{LocoMamba: Vision-Driven Locomotion via End-to-End
+  Deep Reinforcement Learning with Mamba},'' \emph{arXiv e-prints}, p.
+  arXiv:2508.11849, Aug. 2025.
+
+\bibitem{Li_2024_MOVE}
+S.~{Li}, S.~{Luo}, J.~{Wu}, and Q.~{Zhu}, ``{MOVE: Multi-skill Omnidirectional
+  Legged Locomotion with Limited View in 3D Environments},'' \emph{arXiv
+  e-prints}, p. arXiv:2412.03353, Dec. 2024.
+
+\bibitem{Ben_2025_Gallant}
+Q.~{Ben}, B.~{Xu}, K.~{Li}, F.~{Jia}, W.~{Zhang}, J.~{Wang}, J.~{Wang},
+  D.~{Lin}, and J.~{Pang}, ``{Gallant: Voxel Grid-based Humanoid Locomotion and
+  Local-navigation across 3D Constrained Terrains},'' \emph{arXiv e-prints}, p.
+  arXiv:2511.14625, Nov. 2025.
+
+\bibitem{Niijima_2025_Real-timeMulti-PlaneSegmentation}
+S.~{Niijima}, R.~{Tsuzaki}, N.~{Takasugi}, and M.~{Kinoshita}, ``{Real-time
+  Multi-Plane Segmentation Based on GPU Accelerated High-Resolution 3D Voxel
+  Mapping for Legged Robot Locomotion},'' \emph{arXiv e-prints}, p.
+  arXiv:2510.01592, Oct. 2025.
+
+\bibitem{Wang_2025_Omni-Perception}
+Z.~{Wang}, T.~{Ma}, Y.~{Jia}, X.~{Yang}, J.~{Zhou}, W.~{Ouyang}, Q.~{Zhang},
+  and J.~{Liang}, ``{Omni-Perception: Omnidirectional Collision Avoidance for
+  Legged Locomotion in Dynamic Environments},'' \emph{arXiv e-prints}, p.
+  arXiv:2505.19214, May 2025.
+
+\bibitem{Xue_2026_Collision-FreeHumanoidTraversal}
+H.~{Xue}, S.~{Liang}, Z.~{Zhang}, Z.~{Zeng}, Y.~{Liu}, Y.~{Lian}, J.~{Wang},
+  Q.~{Liu}, X.~{Shi}, and L.~{Yi}, ``{Collision-Free Humanoid Traversal in
+  Cluttered Indoor Scenes},'' \emph{arXiv e-prints}, p. arXiv:2601.16035, Jan.
+  2026.
+
+\bibitem{Wang_2025_AdaptiveVision}
+Y.~{Wang}, Y.~{Yue}, Y.~{Yue}, H.~{Wang}, H.~{Jiang}, Y.~{Han}, Z.~{Ni},
+  Y.~{Pu}, M.~{Shi}, R.~{Lu}, Q.~{Yang}, A.~{Zhao}, Z.~{Xia}, S.~{Song}, and
+  G.~{Huang}, ``{Emulating Human-like Adaptive Vision for Efficient and
+  Flexible Machine Visual Perception},'' \emph{arXiv e-prints}, p.
+  arXiv:2509.15333, Sept. 2025.
+
+\bibitem{Zhang_2026_FocusNav}
+Y.~{Zhang}, J.~{Ma}, L.~{Yan}, Z.~{Cao}, Y.~{Zhang}, H.~{Li}, and Y.~{Gao},
+  ``{FocusNav: Spatial Selective Attention with Waypoint Guidance for Humanoid
+  Local Navigation},'' \emph{arXiv e-prints}, p. arXiv:2601.12790, Jan. 2026.
+
+\bibitem{Patel_2024_RoadRunnerMM}
+M.~{Patel}, J.~{Frey}, D.~{Atha}, P.~{Spieler}, M.~{Hutter}, and S.~{Khattak},
+  ``{RoadRunner M\&M - Learning Multi-Range Multi-Resolution Traversability
+  Maps for Autonomous Off-Road Navigation},'' \emph{IEEE Robotics and
+  Automation Letters}, vol.~9, no.~12, pp. 11\,425--11\,432, Jan. 2024.
+
+\bibitem{Liu_2026_ActiveVLA}
+Z.~{Liu}, Y.~{Gu}, Y.~{Wang}, X.~{Xue}, and Y.~{Fu}, ``{ActiveVLA: Injecting
+  Active Perception into Vision-Language-Action Models for Precise 3D Robotic
+  Manipulation},'' \emph{arXiv e-prints}, p. arXiv:2601.08325, Jan. 2026.
+
+\bibitem{Xu_2022_FAST-LIO2}
+W.~{Xu}, Y.~{Cai}, D.~{He}, J.~{Lin}, and F.~{Zhang}, ``{FAST-LIO2: Fast Direct
+  LiDAR-Inertial Odometry},'' \emph{IEEE Transactions on Robotics}, vol.~38,
+  no.~4, pp. 2053--2073, Jan. 2022.
+
+\bibitem{Isaac_Gym}
+V.~{Makoviychuk}, L.~{Wawrzyniak}, Y.~{Guo}, M.~{Lu}, K.~{Storey},
+  M.~{Macklin}, D.~{Hoeller}, N.~{Rudin}, A.~{Allshire}, A.~{Handa}, and
+  G.~{State}, ``{Isaac Gym: High Performance GPU-Based Physics Simulation For
+  Robot Learning},'' \emph{arXiv e-prints}, p. arXiv:2108.10470, Aug. 2021.
+
+\bibitem{nvblox_2023_GPUAcceleratedSDFMapping}
+A.~{Millane}, H.~{Oleynikova}, E.~{Wirbel}, R.~{Steiner}, V.~{Ramasamy},
+  D.~{Tingdahl}, and R.~{Siegwart}, ``{nvblox: GPU-Accelerated Incremental
+  Signed Distance Field Mapping},'' \emph{arXiv e-prints}, p. arXiv:2311.00626,
+  Nov. 2023.
+
+\end{thebibliography}
