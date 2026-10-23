@@ -1,0 +1,7 @@
+PWD /home/sure/workspace/paper_todo/revision_package
+INPUT /etc/texmf/web2c/texmf.cnf
+INPUT /usr/share/texmf/web2c/texmf.cnf
+INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
+INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
+INPUT /home/sure/workspace/paper_todo/revision_package/full_diff.tex
+OUTPUT full_diff.log

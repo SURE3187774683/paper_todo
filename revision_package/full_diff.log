@@ -1,0 +1,33 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.3.28)  23 OCT 2026 20:45
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**/home/sure/workspace/paper_todo/revision_package/full_diff.tex
+(/home/sure/workspace/paper_todo/revision_package/full_diff.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+
+! LaTeX Error: File `ieeeconf/ieeeconf.cls' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: cls)
+
+Enter file name: 
+/home/sure/workspace/paper_todo/revision_package/full_diff.tex:9: Emergency stop.
+<read *> 
+         
+l.9 ^^M
+       
+*** (cannot \read from terminal in nonstop modes)
+
+ 
+Here is how much of TeX's memory you used:
+ 25 strings out of 478287
+ 670 string characters out of 5849289
+ 289007 words of memory out of 5000000
+ 18318 multiletter control sequences out of 15000+600000
+ 469259 words of font info for 28 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 19i,0n,29p,177b,17s stack positions out of 5000i,500n,10000p,200000b,80000s
+/home/sure/workspace/paper_todo/revision_package/full_diff.tex:9:  ==> Fatal error occurred, no output PDF file produced!

@@ -79,7 +79,7 @@ The adaptive reward contains radius smoothness and regularization terms. With cu
 \begin{reviewcomment}
 Resolve whether the radius changes the vertical map only or both maps. State whether the adaptive-radius ablation was run in simulation or on hardware. Clarify whether the robot recovers autonomously in the drop experiment or the safety tether arrests the fall. Add confidence intervals or variance to Fig. 5, and correct the likely typo in the Introduction.
 \end{reviewcomment}
-\Response Thank you for these constructive comments. We agree that these details should be clarified. The radius affects only the vertical distance map; horizontal-map coverage and resolution are fixed. The Table~V adaptive-radius ablation was run in simulation. In the repeated drop experiment, the robot recovered autonomously; the tether was a hardware safety measure and did not arrest the fall. We reduced its tension and repeated the experiment ten times in the same scene with the same policy to clarify its role. We revised Fig.~5 to show the mean and sample standard deviation of success rates across ten independently trained policies, each evaluated using its final checkpoint under the same protocol. We also removed the erroneous wording \textit{3-D negotiation tasks} from the Introduction.
+\Response Thank you for these constructive comments. We agree that these details should be clarified. The radius affects only the vertical distance map; horizontal-map coverage and resolution are fixed. The Table~V adaptive-radius ablation was run in simulation. In the repeated drop experiment, the robot recovered autonomously; the tether was a hardware safety measure and did not arrest the fall. We reduced its tension and repeated the experiment ten times in the same scene with the same policy to clarify its role. We have replaced the drop-experiment video clip in the Multimedia Materials to make the role of the safety tether clearer. We revised Fig.~5 to show the mean and sample standard deviation of success rates across ten independently trained policies, each evaluated using its final checkpoint under the same protocol. We also removed the erroneous wording \textit{3-D negotiation tasks} from the Introduction.
 \Changes
 \begin{itemize}
     \item We clarified the maps in Sec.~I, Sec.~II-B, and Sec.~III-B-1.
@@ -89,7 +89,7 @@ Resolve whether the radius changes the vertical map only or both maps. State whe
 \end{itemize}
 
 
-\Location{Sec.~I, p.~1; Sec.~II-B, p.~2; Sec.~III-B-1, p.~3; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, pp.~6--7; Sec.~IV-C-2 and Fig.~5, p.~7. Tether clarification: response letter only.}
+\Location{Sec.~I, p.~1; Sec.~II-B, p.~2; Sec.~III-B-1, p.~3; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, pp.~6--7; Sec.~IV-C-2 and Fig.~5, p.~7. Tether clarification: response letter and updated drop-experiment video clip in the Multimedia Materials.}
 
 \clearpage
 \section*{Response to Reviewer 3}
@@ -132,8 +132,9 @@ Table III shows that ADAPT outperforms all baselines, including some computation
 \begin{reviewcomment}
 The real-world experiments provide valuable hardware validation. However, for the drop experiment, it is difficult to determine whether the robot recovers its balance autonomously or whether its fall is arrested by the safety tether.
 \end{reviewcomment}
-\Response Thank you for pointing out the video ambiguity. In our repeated drop experiment, the robot recovered autonomously; the tether served as a hardware safety measure rather than arresting the fall. We reduced its tension and repeated the experiment ten times in the same scene with the same policy to clarify its role.
-\Location{Response letter only; no manuscript change.}
+\Response Thank you for pointing out the video ambiguity. In our repeated drop experiment, the robot recovered autonomously; the tether served as a hardware safety measure rather than arresting the fall. We reduced its tension and repeated the experiment ten times in the same scene with the same policy to clarify its role. We have replaced the drop-experiment video clip in the Multimedia Materials to make the role of the safety tether clearer.
+\Changes We have replaced the drop-experiment video clip in the Multimedia Materials.
+\Location{Response letter and Multimedia Materials (updated drop-experiment video clip); no manuscript text change.}
 
 
 
