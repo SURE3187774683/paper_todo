@@ -15,9 +15,9 @@
 {\large ADAPT: Adaptive Dual-projection Architecture for Perceptive Traversal}
 \end{center}
 \vspace{0.8em}
-Dear Editor, Associate Editor, and Reviewers,
+Dear Associate Editor and Reviewers,
 
-Thank you for your careful assessment and constructive suggestions. We have revised the manuscript to clarify its efficiency comparisons and adaptive sensing mechanism, explain the adaptive reward, and improve the presentation of the simulation and hardware experiments.
+Thank you for your careful assessment and constructive suggestions. We have revised the manuscript to clarify the efficiency comparisons and adaptive sensing mechanism, explain the adaptive reward, and improve the presentation of the simulation and hardware experiments.
 
 The principal revisions are summarized below:
 \begin{itemize}
@@ -45,9 +45,11 @@ Authors claim that ADAPT provides a more compact representation and potentially 
 \end{reviewcomment}
 \Response Thank you for requesting this clarification. We agree that the efficiency metrics should be stated explicitly. The 56\% figure refers to \emph{peak GPU memory during training} relative to the Gallant voxel baseline. Using the same modified NVIDIA RTX 4090 GPU with 48 GB of VRAM and identical PPO settings (4,096 parallel environments, a rollout of 24 steps per environment per policy update, 5 PPO epochs per update, and 4 mini-batches per epoch; each rollout batch contains $4{,}096\times24=98{,}304$ transitions), peak memory is 36,054\,MiB for Gallant and 15,870\,MiB for ADAPT: $(36{,}054-15{,}870)/36{,}054=55.98\%$. The respective iteration times are 34.6\,s and 11.3\,s, so ADAPT takes 32.7\% of Gallant's time under this setup.
 
+Sec.~IV-B-3 states that the methods share the same training settings; the specific numerical PPO settings listed above are provided only in this response letter.
+
 The 98.6\% figure compares \emph{single-frame external perception inputs before encoding}. Gallant's $32\times32\times40$ voxel grid has 40,960 values; ADAPT's $21\times17$ horizontal elevation and $13\times17$ vertical distance maps have 578 values in total. Thus $(40{,}960-578)/40{,}960=98.59\%$.
 
-To evaluate deployment efficiency, we added measurements of deployment latency and computational resource usage. Table~IV(b) compares ADAPT with the main voxel baseline, Gallant, on the same local computer (Intel i7-12700H CPU and NVIDIA RTX 3060 Laptop GPU). This local computer was also used for perception and policy inference in the real-world robot experiments; we have corrected the deployment description in Sec.~IV-A-2. Mean map-construction latency decreases from 64.06 to 41.64\,ms, policy GPU inference latency from 1.91 to 1.40\,ms, and perception-to-command-publication latency from 79.45 to 55.94\,ms (29.6\% lower). Sampled peak GPU memory decreases from 5,711 to 2,373\,MiB (58.4\% lower); mean whole-host CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04\,GiB.
+To evaluate deployment efficiency, we added measurements of deployment latency and computational resource usage. Table~IV(b) compares ADAPT with the main voxel baseline, Gallant, on the same local computer (Intel i7-12700H CPU and NVIDIA RTX 3060 Laptop GPU). This local computer was also used for perception and policy inference in the real-world robot experiments; we have corrected the deployment description in Sec.~IV-A-2. Mean map-construction latency decreases from 64.06 to 41.64\,ms, policy inference latency on GPU decreases from 1.91 to 1.40\,ms, and perception-to-command-publication latency from 79.45 to 55.94\,ms (29.6\% lower). Sampled peak GPU memory decreases from 5,711 to 2,373\,MiB (58.4\% lower); mean whole-host CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04\,GiB.
 \Changes
 \begin{itemize}
     \item Sec.~I restates the two efficiency quantities.
@@ -68,10 +70,10 @@ The adaptive reward contains radius smoothness and regularization terms. With cu
 \Changes
 \begin{itemize}
     \item Sec.~IV-B-3 adds the voxel resolution--coverage trade-off, the speed-dependent performance gap, and the observed abrupt deceleration and loss of balance, together with the limited-look-ahead explanation.
-    \item The Active Perception item in Sec.~III-B-3 describes the radius smoothness and initial-radius deviation penalties.
+    \item The Active Perception item in Sec.~III-B-3 now includes the formulas for the radius smoothness and initial-radius deviation penalties and defines the radius variables.
     \item Sec.~IV-B-4 specifies that the reward ablation removes both terms while retaining the radius in the observation and action spaces, and discusses their role in stabilizing radius selection at higher speeds (Table~V).
 \end{itemize}
-\Location{Sec.~III-B-3, pp.~3--4; Secs.~IV-B-3--IV-B-4, pp.~5--6; Tables~III and V, p.~6.}
+\Location{Sec.~III-B-3, p.~4; Secs.~IV-B-3--IV-B-4, pp.~5--6; Tables~III and V, p.~6.}
 
 
 
@@ -89,7 +91,7 @@ Resolve whether the radius changes the vertical map only or both maps. State whe
 \end{itemize}
 
 
-\Location{Sec.~I, p.~1; Sec.~II-B, p.~2; Sec.~III-B-1, p.~3; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, pp.~6--7; Sec.~IV-C-2 and Fig.~5, p.~7. Tether clarification: response letter and updated drop-experiment video clip in the Multimedia Materials.}
+\Location{Sec.~I, p.~1; Sec.~II-B, p.~2; Sec.~III-B-1, p.~3; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, p.~7; Sec.~IV-C-2 and Fig.~5, p.~7. Tether clarification: response letter and updated drop-experiment video clip in the Multimedia Materials.}
 
 \clearpage
 \section*{Response to Reviewer 3}
@@ -144,13 +146,13 @@ Table IV reports training efficiency, but inference efficiency is arguably more 
 \end{reviewcomment}
 \Response Thank you for this suggestion. We have extended Table~IV with runtime measurements for ADAPT and the Gallant voxel baseline and added the measurement setup and analysis in Sec.~IV-C-3. Both methods were deployed and benchmarked on the same local computer with an Intel i7-12700H CPU and an NVIDIA RTX 3060 Laptop GPU with 6 GiB VRAM. Both the real-world robot experiments and the latency and resource-usage benchmarks used this local-computer deployment setup. Perception and policy inference ran on the local computer, which generated and sent joint-angle targets to the robot at 50 Hz. No Jetson Orin NX was used in either set of experiments. We have corrected the original deployment description in Sec.~IV-A-2 and clarified the shared setup in Sec.~IV-C-3. Table~IV(b) reports latency and resource usage on the local computer used for deployment.
 
-Each method was tested five times on each of three terrain categories: flat ground, a single obstacle, and a complex environment, for 15 trials per method. Latency entries are equal-weight averages of per-trial means and P95s. Map latency spans the input callback to the first observed map-ready event; perception-to-publish latency spans that callback to the first command-publication call using the update. Policy GPU inference latency is measured with current-stream CUDA events. For ADAPT, each map-latency and perception-to-publish entry reports the larger statistic of its two map streams. CPU utilization and RAM usage are whole-host averages, and peak VRAM is the maximum sampled usage.
+Each method was tested five times on each of three terrain categories: flat ground, a single obstacle, and a complex environment, for 15 trials per method. Latency entries are equal-weight averages of per-trial means and P95s. Map latency spans the input callback to the first observed map-ready event; perception-to-publish latency spans that callback to the first command-publication call using the update. Policy inference latency on GPU is measured with current-stream CUDA events. For ADAPT, each map-latency and perception-to-publish entry reports the larger statistic of its two map streams. CPU utilization and RAM usage are whole-host averages, and peak VRAM is the maximum sampled usage.
 
-Relative to Gallant, ADAPT reduces mean map latency from 64.06 to 41.64 ms and mean perception-to-publish latency from 79.45 to 55.94 ms, a 29.6\% reduction for the latter. Mean policy GPU inference latency decreases from 1.91 to 1.40 ms, and sampled peak VRAM decreases from 5,711 to 2,373 MiB (58.4\% lower). Mean CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04 GiB.
+Relative to Gallant, ADAPT reduces mean map latency from 64.06 to 41.64 ms and mean perception-to-publish latency from 79.45 to 55.94 ms. Mean policy inference latency on GPU decreases from 1.91 to 1.40 ms, and sampled peak VRAM decreases from 5,711 to 2,373 MiB. Mean CPU utilization decreases from 38.19\% to 17.76\%, and RAM usage from 10.66 to 8.04 GiB.
 \Changes Sec.~IV-A-2 now states that real-world perception and policy inference run on the local computer, which sends joint-angle targets to the robot at 50 Hz. Table~IV(b) and Sec.~IV-C-3 report the runtime comparison on the same deployment computer, measurement boundaries, hardware, and trial setup.
 
 
-\Location{Abstract and Sec.~I, p.~1; Sec.~IV-A-2, p.~5; Table~IV(b), p.~6; Sec.~IV-C-3, p.~7.}
+\Location{Abstract and Sec.~I, p.~1; Sec.~IV-A-2, p.~4; Table~IV(b), p.~6; Sec.~IV-C-3, p.~7.}
 
 \clearpage
 \section*{Response to Reviewer 8}
@@ -177,13 +179,15 @@ In the introduction, you claim that the adaptive sensing mechanism is responsibl
 \end{reviewcomment}
 \Response Thank you for pointing this out. We agree that the original comparison was imprecise. The 56\% result is the reduction in training \emph{peak GPU memory} relative to Gallant: $(36{,}054-15{,}870)/36{,}054=55.98\%$, with values in MiB. Using the same modified NVIDIA RTX 4090 GPU with 48 GB of VRAM and common PPO settings (4,096 parallel environments, a rollout of 24 steps per environment per policy update, 5 PPO epochs per update, and 4 mini-batches per epoch; each rollout batch contains $4{,}096\times24=98{,}304$ transitions), iteration time is 34.6\,s for Gallant and 11.3\,s for ADAPT; ADAPT takes 32.7\% of the baseline's time. These results compare the implemented representation and encoder pipelines, not the isolated effect of adaptive-radius selection.
 
+Sec.~IV-B-3 states that the methods share the same training settings; the specific numerical PPO settings listed above are provided only in this response letter.
+
 The 98.6\% result compares only single-frame perception inputs \emph{before encoding}: $32\times32\times40=40{,}960$ voxel values for Gallant versus $21\times17+13\times17=578$ map values for ADAPT, giving $(40{,}960-578)/40{,}960=98.59\%$. It does not compare total actor observations.
 \Changes
 \begin{itemize}
     \item The Abstract states a 98.6\% reduction in exteroceptive input dimensionality relative to our implementation of Gallant and qualitatively summarizes lower deployment latency and resource usage.
     \item Sec.~I gives the quantitative training and local-computer deployment comparisons.
     \item The caption of Table~I in Sec.~II-A defines sensory dimension as pre-encoder input elements, excluding proprioception, history, and critic-only inputs.
-    \item Sec.~IV-B-3 gives the dimensionality calculation and common training settings; Table~IV(a) reports wall-clock iteration times and peak GPU memory.
+    \item Sec.~IV-B-3 gives the dimensionality calculation and states that hardware and training settings are identical across methods; Table~IV(a) reports wall-clock iteration times and peak GPU memory. The specific numerical PPO settings are provided only in this response letter.
 \end{itemize}
 \Location{Abstract and Sec.~I, p.~1; Sec.~II-A and Table~I, p.~2; Sec.~IV-B-3, p.~5; Table~IV(a)--(b), p.~6; Sec.~IV-C-3, p.~7.}
 
@@ -196,8 +200,9 @@ The abstract, introduction, and Sec. II-B say the radius modulates the vertical 
 \Response Thank you for highlighting this ambiguity. We agree that the scope of radius adaptation should be explicit. The adaptive radius affects only the vertical distance map. Horizontal-map coverage and sampling resolution remain fixed.
 \Changes
 \begin{itemize}
-    \item Sec.~I, Sec.~III-A, Sec.~III-B-1, Sec.~III-B-2, and Sec.~III-C specify that $r_t$ changes only the vertical map's radial range and sampling interval.
-    \item The horizontal map retains fixed coverage and sampling resolution, consistent with Sec.~II-B.
+    \item Secs.~I and II-B clarify that radius adaptation applies only to the vertical distance map, while the horizontal elevation map retains fixed coverage and sampling resolution.
+    \item Secs.~III-A and III-C identify the vertical-map sensing radius as a policy output; Sec.~III-B-1 identifies the previous radius $r_{t-1}$ as an observation.
+    \item Sec.~III-B-2 explains how $r_t$ changes the vertical map's radial range and sampling interval, $\delta_r=r_t/N_r$, while the angular span and number of bins remain fixed. Fig.~2 illustrates this range--resolution trade-off.
 \end{itemize}
 \Location{Abstract and Sec.~I, p.~1; Secs.~II-B and III-A, p.~2; Secs.~III-B-1--III-B-2, p.~3; Sec.~III-C and Fig.~2, p.~4.}
 
@@ -214,7 +219,7 @@ Was the ablation study on the adaptive radius mechanism done in simulation or in
     \item The same section clarifies that each trial contains five obstacles and that success is the fraction of obstacles crossed, with statistics pooled across the three terrains at each speed.
     \item We removed the Table~V comparison from Sec.~IV-C-1, which covers hardware tests.
 \end{itemize}
-\Location{Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, pp.~6--7.}
+\Location{Sec.~IV-B-4, pp.~5--6; Table~V, p.~6; Sec.~IV-C-1, p.~7.}
 
 
 
@@ -232,11 +237,11 @@ where $\lambda_s=\lambda_r=0.1$ during training. Thus, the combined radius-relat
 Our interpretation is that radius actions affect locomotion indirectly through future perception, which may be harder to learn than direct motor actions. Without regularization, early radius oscillation or drift can make observations less consistent; higher speeds may increase sensitivity to unsuitable or unstable sensing ranges. This is an interpretation of the ablation, not a separate causal measurement of either reward term.
 \Changes
 \begin{itemize}
-    \item The Active Perception item in Sec.~III-B-3 describes the smoothness and initial-radius deviation penalties.
+    \item The Active Perception item in Sec.~III-B-3 now includes the formulas for the smoothness and initial-radius deviation penalties and defines the radius variables.
     \item Sec.~IV-B-4 states that the reward ablation removes both terms and interprets the high-speed result.
-    \item The exact formulas, training weights, and clarification that no speed- or obstacle-dependent target radius is prescribed are provided directly in this response.
+    \item The formulas are reproduced above for convenience. The numerical training weights and the explicit clarification that no speed- or obstacle-dependent target radius is prescribed are provided only in this response letter.
 \end{itemize}
-\Location{Sec.~III-B-3, pp.~3--4; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6. Formulas and weights: response letter.}
+\Location{Sec.~III-B-3, Active Perception item and reward formulas, p.~4; Sec.~IV-B-4, pp.~5--6; Table~V, p.~6. Numerical training weights and explicit target-radius clarification: response letter only.}
 
 
 
@@ -244,7 +249,7 @@ Our interpretation is that radius actions affect locomotion indirectly through f
 \begin{reviewcomment}
 Fig. 1 makes it look like the actor also receives the privileged states, which contradicts what is claimed by the text in Sec. III-C. I also think Fig. 1 could be more informative if it showed the recurrent nature of the actor.
 \end{reviewcomment}
-\Response Thank you for identifying the diagram error. We revised Fig.~1 so that the actor receives only deployable observations while the separate critic receives the additional privileged elevation map. The figure now shows independent actor and critic LSTM hidden-state loops. Each branch uses an LSTM with a hidden dimension of 256, followed by an MLP with hidden dimensions $[128,64,32]$ and ELU activations. The horizontal-map MLP encoder has hidden dimensions $[256,128,64]$, and the vertical-map MLP encoder has hidden dimensions $[128,64]$; both use CELU activations and produce 32-dimensional embeddings. The two map embeddings form a 64-dimensional environmental representation. The actor and critic maintain separate recurrent states, and the privileged ground-truth elevation map is supplied only to the critic.
+\Response Thank you for identifying the diagram error. We have revised Fig.~1 so that the actor receives only deployable observations while the separate critic receives the additional privileged elevation map. The figure now shows independent actor and critic LSTM hidden-state loops. Each branch uses an LSTM with a hidden dimension of 256, followed by an MLP with hidden dimensions $[128,64,32]$ and ELU activations. The horizontal-map MLP encoder has hidden dimensions $[256,128,64]$, and the vertical-map MLP encoder has hidden dimensions $[128,64]$; both use CELU activations and produce 32-dimensional embeddings. The two map embeddings form a 64-dimensional environmental representation. The actor and critic maintain separate recurrent states, and the privileged ground-truth elevation map is supplied only to the critic.
 \Changes Fig.~1 in Sec.~III-B-1 (Observation Space) and Sec.~III-C (Training Architecture) now distinguish the inputs and recurrent states of the actor and critic.
 \Location{Sec.~III-B-1 and Fig.~1, p.~3; Sec.~III-C, p.~4. Layer specifications: response letter.}
 
@@ -260,7 +265,7 @@ Fig. 5 only shows the average success rates, it would be better to show also con
     \item Sec.~IV-C-1 specifies ten independent training seeds, final-checkpoint selection, and the common evaluation protocol: one trial per policy at each of three speeds, for 30 trials per terrain and domain.
     \item Fig.~5 and its caption in Sec.~IV-C-2 now report the mean and sample standard deviation across the ten policy-level success rates and specify single-obstacle evaluation in matched simulation and real-world scenes.
 \end{itemize}
-\Location{Secs.~IV-C-1--IV-C-2, pp.~6--7; Fig.~5, p.~7.}
+\Location{Secs.~IV-C-1--IV-C-2, p.~7; Fig.~5, p.~7.}
 
 
 \end{document}

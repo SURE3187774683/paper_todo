@@ -84,7 +84,7 @@ ADAPT: Adaptive Dual-projection Architecture for Perceptive Traversal
 % 3.提出方法：ADAPT，通过双投影表示和策略控制的感知半径联合解决表示与感知尺度问题。
 % 4.总结实验：在仿真和真机上验证鲁棒性、效率和迁移能力。
 % 
-Agile humanoid locomotion in complex 3D environments requires reasoning about both ground-support geometry and body-level traversable space under the strict latency constraints of high-frequency control. Existing perceptive locomotion methods often face two coupled limitations: compact 2.5D maps are efficient but miss vertical clearance constraints, whereas dense 3D representations provide richer geometry at higher computational cost; meanwhile, fixed sensing scale cannot adapt to changes in motion speed and local environmental complexity. We propose \textbf{ADAPT} (\textbf{A}daptive \textbf{D}ual-projection \textbf{A}rchitecture for \textbf{P}erceptive \textbf{T}raversal), a perception-control framework that addresses both representation efficiency and sensing-scale adaptation. ADAPT decomposes local 3D geometry into two compact projections: a horizontal elevation map for terrain support and a vertical distance map for body-level clearance. It further treats the sensing radius of the vertical map as a reinforcement learning policy action, enabling the robot to expand its perceptual horizon for long-range anticipation and contract it for higher local resolution in cluttered spaces. Experiments show that ADAPT achieves a \RevisionAdd{94.75}\% success rate across diverse 3D traversal tasks, \RevisionAdd{and reduces the exteroceptive observation input }dimensionality by 98.6\% \RevisionAdd{relative to our implementation of the Gallant baseline, while also lowering deployment latency and computational resource usage}. The learned policy achieves zero-shot transfer to a Unitree G1 humanoid robot and enables real-world space traversal.
+Agile humanoid locomotion in complex 3D environments requires reasoning about both ground-support geometry and body-level traversable space under the strict latency constraints of high-frequency control. Existing perceptive locomotion methods often face two coupled limitations: compact 2.5D maps are efficient but miss vertical clearance constraints, whereas dense 3D representations provide richer geometry at higher computational cost; meanwhile, fixed sensing scale cannot adapt to changes in motion speed and local environmental complexity. We propose \textbf{ADAPT} (\textbf{A}daptive \textbf{D}ual-projection \textbf{A}rchitecture for \textbf{P}erceptive \textbf{T}raversal), a perception-control framework that addresses both representation efficiency and sensing-scale adaptation. ADAPT decomposes local 3D geometry into two compact projections: a horizontal elevation map for terrain support and a vertical distance map for body-level clearance. It further treats the sensing radius of the vertical map as a reinforcement learning policy action, enabling the robot to expand its perceptual horizon for long-range anticipation and contract it for higher local resolution in cluttered spaces. \RevisionAdd{ADAPT reduces the dimensionality of exteroceptive observation input by $98.6\%$ relative to our implementation of the Gallant baseline, and experiments show a $94.75\%$ success rate across diverse 3D traversal tasks with lowered deployment latency and computational resource usage}. The learned policy achieves zero-shot transfer to a Unitree G1 humanoid robot and enables real-world space traversal.
 \end{abstract}    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
@@ -98,10 +98,10 @@ However, onboard perception for legged robots is constrained by strict latency a
 A second limitation is that perception is usually acquired with a fixed spatial range~\cite{Ben_2025_Gallant,Multi-Layer_ElevationMap_2025,long2025learning}, which is misaligned with the changing information demand of locomotion: fast motion needs a longer horizon while cluttered traversal needs higher local resolution. A perceptive controller should therefore decide not only how to act given perception, but also how much spatial context should be sensed.
 
 % 为了解决这两个问题：我们提出双投影，自适应半径解决感知尺度问题。
-To address these two issues, this paper proposes \textbf{ADAPT} (\textbf{A}daptive \textbf{D}ual-projection \textbf{A}rchitecture for \textbf{P}erceptive \textbf{T}raversal) that restructures local 3D geometry into two orthogonal and information-dense projections. A horizontal elevation map describes ground geometry for stable foothold selection, while a vertical distance map describes body-level traversable space for avoiding overhangs and obstacles. Instead of using a fixed perceptual horizon, ADAPT further exposes the sensing radius of the vertical distance map to the reinforcement learning policy as a control variable. The \RevisionAdd{horizontal elevation map retains a fixed spatial extent and sampling resolution. The }policy can thus expand \RevisionAdd{the vertical map's }perceptual horizon during fast traversal and contract it for fine-grained local reasoning in cluttered scenes. In this way, ADAPT jointly addresses what spatial information should be represented and how much of it should be sensed at each moment.
+To address these two issues, this paper proposes \textbf{ADAPT} (\textbf{A}daptive \textbf{D}ual-projection \textbf{A}rchitecture for \textbf{P}erceptive \textbf{T}raversal) that restructures local 3D geometry into two orthogonal and information-dense projections. A horizontal elevation map describes ground geometry for stable foothold selection, while a vertical distance map describes body-level traversable space for avoiding overhangs and obstacles. Instead of using a fixed perceptual horizon, ADAPT further exposes the sensing radius of the vertical distance map to the reinforcement learning policy as a control variable\RevisionAdd{, while the horizontal elevation map retains a fixed spatial extent and sampling resolution. The policy can thus expand the vertical map's} perceptual horizon during fast traversal and contract it for fine-grained local reasoning in cluttered scenes. In this way, ADAPT jointly addresses what spatial information should be represented and how much of it should be sensed at each moment.
 
 % 实验意义：实验指标对应鲁棒性、效率和真机可部署性。
-Empirical evaluation \RevisionAdd{shows that }ADAPT achieves a \RevisionAdd{mean success rate of $94.75\%$ across eight terrain categories and reduces per-frame actor exteroceptive }dimensionality by $98.6\%$ \RevisionAdd{relative to Gallant. Under matched training settings, it uses $56\%$ less peak GPU memory and }$32.7\%$ of \RevisionAdd{Gallant's iteration time. On the same local computer, perception-to-command-publication latency and sampled peak GPU memory decrease by $29.6\%$ and $58.4\%$, respectively (Section~\ref{sec:experiment})}.
+\RevisionAdd{Empirical evaluation shows that ADAPT reduces per-frame actor exteroceptive dimensionality by $98.6\%$ relative to the baseline Gallant and achieves a mean success rate of $94.75\%$ across eight terrain categories. Under matched training settings, it uses $56\%$ less peak GPU memory and $32.7\%$ of Gallant's iteration time. On the same local computer, perception-to-command-publication latency and sampled peak GPU memory decrease by $29.6\%$ and $58.4\%$, respectively (Section~\ref{sec:experiment})}.
 
 The main contributions of this work are:
 \begin{itemize}
@@ -115,13 +115,27 @@ The main contributions of this work are:
 \subsection{Perception for Legged Locomotion}
 \label{sec:RELATED WORKS}
 % 总述相关工作：先指出感知表示的共同矛盾，为后文分类讨论做铺垫。
-Table~\ref{table:comparison_method} \RevisionAdd{compares elevation}, image/\RevisionAdd{depth}, and volumetric or point-based representations \RevisionAdd{in terms of geometry, input size, and sensing adaptation.
-}
+\RevisionAdd{Table~\ref{table:comparison_method} compares elevation, image/depth, and volumetric or point-based representations in terms of geometry, input size, and sensing adaptation.}
 
-\begin{table}[ht]
+% 第一种方法（高程图）：优点：高效落脚，缺点：缺少垂直空间约束。
+Elevation maps~\cite{Fankhauser2014RobotCentricElevationMapping,Fankhauser2018ProbabilisticTerrainMapping,long2025learning,wang2025beamdojo,ren2025vb,he2025attention,Zhang_2026_AME2} provide efficient 2.5D grids for foothold reasoning. However, their height-field assumption inherently discards vertical structures like overhangs and side walls, missing the body-level clearance constraints crucial for humanoid traversal in 3D clutter.
+
+% 第二种方法（深度和视觉）：优点：信息直接 缺点：不够结构化，学习和部署都更困难。
+Depth and vision-based methods~\cite{zhuang2024humanoidRobot,Li_2024_MOVE,zhuang2024humanoid,Yu_2025_START,Castillo_2025_LearningTerrainAwareBipedalLocomotion,Sun_2025_DPL,Wang_2025_LocoMamba,zhu2026hiking} offer richer scene observations for agile locomotion. Yet, their unstructured inputs heavily burden the learning system and are susceptible to occlusions, viewpoint shifts, and illumination changes. While reduced visual encodings mitigate this, they tend to entangle ground geometry with visual noise rather than explicitly separating the needed spatial constraints.
+
+
+% 第三种方法（体素和点云）：优点：强调3D语义更完整，缺点：维度、延迟和训练效率。
+Volumetric, point-cloud and multi-plane representations aim to recover more complete 3D spatial awareness~\cite{Multi-Layer_ElevationMap_2025,Ben_2025_Gallant,Niijima_2025_Real-timeMulti-PlaneSegmentation,Wang_2025_Omni-Perception,Xue_2026_Collision-FreeHumanoidTraversal}. These methods are better suited to collision avoidance and constrained-space traversal because they can encode obstacles beyond the terrain surface. Their main drawback is the cost of maintaining and processing dense 3D structure. Voxel grids scale cubically with resolution and incur high memory traffic~\cite{2020arXiv200716100T}, leading to severe inference latency (e.g., $4.4$\,Hz in~\cite{2018arXiv181205784L}) that fails the $\ge 10$\,Hz requirement for closed-loop control~\cite{2022arXiv220108117M} and inflated training iteration times (e.g., $>22$\,s/iter in~\cite{Ben_2025_Gallant}). Point-based representations require careful sampling and aggregation to remain stable for policy learning. Multi-plane methods mitigate the cubic cost but leave vertical clearance implicit, forcing the policy to infer the gap between an overhead obstacle and the supporting ground across plane indices rather than from a direct distance measurement. The increased latency and observation dimensionality can slow training and reduce the responsiveness needed for high-speed humanoid motion.
+
+% 最后总结ADAPT的表示方式：在2.5D效率和3D通行语义之间建立中间表示。
+\RevisionAdd{ADAPT bridges these approaches with two compact projections that explicitly separate ground support from body-level clearance without encoding the full local volume}.
+
+\subsection{Adaptive Perception and Behavior Modulation}
+
+\begin{table}[t]
     \centering
     % \vspace{-5pt}
-    \caption{ADAPT comparison with existing works\RevisionAdd{. Sensory dimension counts the per-frame perceptual input elements before encoding, excluding proprioception, observation history, and critic-only privileged inputs.}}
+    \caption{\RevisionAdd{Comparison of ADAPT with existing works. Sensory dimension counts the per-frame perceptual input elements before encoding, excluding proprioception, observation history, and critic-only privileged inputs.}}
     \resizebox{\columnwidth}{!}{
     \begin{tabular}{lccccc}
     \toprule 
@@ -142,20 +156,6 @@ Table~\ref{table:comparison_method} \RevisionAdd{compares elevation}, image/\Rev
     % \vspace{-10pt}
 \end{table}
 
-% 第一种方法（高程图）：优点：高效落脚，缺点：缺少垂直空间约束。
-Elevation maps~\cite{Fankhauser2014RobotCentricElevationMapping,Fankhauser2018ProbabilisticTerrainMapping,long2025learning,wang2025beamdojo,ren2025vb,he2025attention,Zhang_2026_AME2} provide efficient 2.5D grids for foothold reasoning. However, their height-field assumption inherently discards vertical structures like overhangs and side walls, missing the body-level clearance constraints crucial for humanoid traversal in 3D clutter.
-
-% 第二种方法（深度和视觉）：优点：信息直接 缺点：不够结构化，学习和部署都更困难。
-Depth and vision-based methods~\cite{zhuang2024humanoidRobot,Li_2024_MOVE,zhuang2024humanoid,Yu_2025_START,Castillo_2025_LearningTerrainAwareBipedalLocomotion,Sun_2025_DPL,Wang_2025_LocoMamba,zhu2026hiking} offer richer scene observations for agile locomotion. Yet, their unstructured inputs heavily burden the learning system and are susceptible to occlusions, viewpoint shifts, and illumination changes. While reduced visual encodings mitigate this, they tend to entangle ground geometry with visual noise rather than explicitly separating the needed spatial constraints.
-
-
-% 第三种方法（体素和点云）：优点：强调3D语义更完整，缺点：维度、延迟和训练效率。
-Volumetric, point-cloud and multi-plane representations aim to recover more complete 3D spatial awareness~\cite{Multi-Layer_ElevationMap_2025,Ben_2025_Gallant,Niijima_2025_Real-timeMulti-PlaneSegmentation,Wang_2025_Omni-Perception,Xue_2026_Collision-FreeHumanoidTraversal}. These methods are better suited to collision avoidance and constrained-space traversal because they can encode obstacles beyond the terrain surface. Their main drawback is the cost of maintaining and processing dense 3D structure. Voxel grids scale cubically with resolution and incur high memory traffic~\cite{2020arXiv200716100T}, leading to severe inference latency (e.g., $4.4$\,Hz in~\cite{2018arXiv181205784L}) that fails the $\ge 10$\,Hz requirement for closed-loop control~\cite{2022arXiv220108117M} and inflated training iteration times (e.g., $>22$\,s/iter in~\cite{Ben_2025_Gallant}). Point-based representations require careful sampling and aggregation to remain stable for policy learning. Multi-plane methods mitigate the cubic cost but leave vertical clearance implicit, forcing the policy to infer the gap between an overhead obstacle and the supporting ground across plane indices rather than from a direct distance measurement. The increased latency and observation dimensionality can slow training and reduce the responsiveness needed for high-speed humanoid motion.
-
-% 最后总结ADAPT的表示方式：在2.5D效率和3D通行语义之间建立中间表示。
-ADAPT \RevisionAdd{bridges these approaches with two compact projections that explicitly separate ground support from }body-level clearance \RevisionAdd{without encoding the full local volume}.
-
-\subsection{Adaptive Perception and Behavior Modulation}
 % 提出需求：不同运动阶段需要不同感知范围，固定感知会造成信息不足或资源浪费。
 The need for adaptive perception arises from the non-uniform information demand of locomotion: fast traversal requires a long perceptual horizon to anticipate obstacles, whereas cluttered traversal benefits more from high-resolution local geometry. A fixed sensing range cannot satisfy both simultaneously.
 
@@ -167,15 +167,14 @@ Spatial attention and foveation methods select informative regions or suppress i
 Active perception mechanisms change the sensing focus or viewpoint according to task context~\cite{Liu_2026_ActiveVLA}, and perceptive locomotion methods adapt gait and footholds based on terrain observations~\cite{zhuang2024humanoid,long2025learning,wang2025beamdojo,ren2025vb}. Nevertheless, perception is typically organized as an upstream module with a fixed range, and the downstream policy adapts actions to those observations. The missing component is a feedback path in which the same policy that generates motion also regulates the amount of spatial information it receives.
 
 % 本文引出：ADAPT不是改变传感器视角，而是让策略控制感知范围，使感知尺度和运动策略在闭环中共同优化。
-ADAPT \RevisionAdd{closes this feedback loop by making only the vertical map's sensing radius a }policy action and \RevisionAdd{including }the previous radius \RevisionAdd{in }the observation. \RevisionAdd{The horizontal map retains fixed coverage and resolution. Reinforcement learning jointly adapts locomotion and sensing range without changing the sensor pose.
-}
+\RevisionAdd{ADAPT closes this feedback loop by making only the vertical map's sensing radius a policy action and including the previous radius in the observation. The horizontal map retains fixed coverage and resolution. Reinforcement learning jointly adapts locomotion and sensing range without changing the sensor pose.}
 
 % This mechanism allows the system to optimize the signal-to-noise ratio autonomously. Consequently, the policy ensures safe negotiation of hazardous terrain and ignores irrelevant distal features.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Methods}
 \subsection{Problem Formulation}
-The perceptive traversal task is formalized as a goal-conditioned Partially Observable Markov Decision Process (POMDP). At step $t$, policy $\pi_\theta$ receives \RevisionAdd{the robot }state and local \RevisionAdd{geometry in $\mathbf{o}_t$ and outputs joint targets and a vertical-map sensing radius, $\mathbf{a}_t=(\mathbf{q}_t,r_t)$}.
+The perceptive traversal task is formalized as a goal-conditioned Partially Observable Markov Decision Process (POMDP). \RevisionAdd{At step $t$, policy $\pi_\theta$ receives the robot state and local geometry in $\mathbf{o}_t$ and outputs joint targets and a vertical-map sensing radius, $\mathbf{a}_t=(\mathbf{q}_t,r_t)$}.
 
 Driven by the stochastic transition dynamics $\mathcal{T}$, the agent seeks to learn an optimal policy $\pi^*$ that maximizes the expected cumulative discounted return:
 \begin{equation}
@@ -193,8 +192,8 @@ The training pipeline is illustrated in Fig.~\ref{fig:network_architecture}.
 \begin{figure*}[t]
 \captionsetup{textfont={color=red},labelfont={color=red}}
     \centering
-    \includegraphics[width=0.9\textwidth]{figure/net_architecture.png}
-    \caption{Illustration of the training architecture for the proposed control framework ADAPT.
+    \includegraphics[width=0.95\textwidth]{figure/net_architecture.png}
+    \caption{Illustration of the training pipeline for the proposed control framework ADAPT.
     }
     \label{fig:network_architecture}
 \end{figure*}
@@ -216,12 +215,29 @@ The specific components in~\eqref{eq:observation_vector} are:
     We rasterize the raw point cloud into grid structures \RevisionAdd{used by both the actor and critic }to facilitate efficient processing. Consequently, this input is processed into two orthogonal robot-centric maps as shown in Fig.~\ref{fig:network_architecture}:
     (1) A \textit{horizontal elevation map ($\mathbf{E}_t \in \mathbb{R}^{21 \times 17}$)} that captures terrain geometry via discrete height sampling.
     (2) A \textit{vertical distance map ($\mathbf{D}_t \in \mathbb{R}^{13 \times 17}$)} that encodes spatial traversability. The distance map is generated by projecting points into a cylindrical sector spanning from $-45$ to $+45$ degrees around the vertical axis, where each point records the distance to the nearest obstacle.
-    \item \textit{Adaptive Perception Radius:} The radius $r_{t-1}$ \RevisionAdd{controls only the radial sensing range of the vertical distance map $\mathbf{D}_t$. The horizontal elevation map $\mathbf{E}_t$ uses a fixed spatial extent and sampling resolution, both independent of this radius}. It is constrained to $r_t \in [1, 5]$\,m throughout training and deployment. The vertical distance map uses a cylindrical sector grid with a fixed number of bins $(N_r, N_\theta) = (13, 17)$ as illustrated in Fig.~\ref{fig:adaptive_radius}. For a selected radius $r_{t-1}$, the radial sampling interval is defined as
-    $\delta_r = {r_{t-1}}/{N_r}$,
-    which makes the \RevisionAdd{radial sampling interval of the vertical distance map }grow linearly with the sensing radius\RevisionAdd{; the angular span and number of bins remain fixed}. Therefore, a larger radius extends the perceptual horizon but coarsens sampling resolution, while a smaller radius concentrates the grids and yields finer resolution. \RevisionAdd{When long-range perception is unnecessary, reducing }the sensing radius \RevisionAdd{can also limit the influence of }distal sensor noise \RevisionAdd{by excluding distant returns from the map}.
+    \item \textit{Adaptive Perception Radius:} 
+    \RevisionAdd{The radius $r_{t-1}$ represents the previous radial sensing range of the vertical distance map, the mechanism of which will be further explained in the description of action space.}
+    % The radius $r_{t-1}$ \RevisionAdd{controls only the radial sensing range of the vertical distance map $\mathbf{D}_t$, while the horizontal elevation map $\mathbf{E}_t$ uses a fixed spatial extent and sampling resolution}. It is constrained to $r_t \in [1, 5]$\,m throughout training and deployment. The vertical distance map uses a cylindrical sector grid with a fixed number of bins $(N_r, N_\theta) = (13, 17)$ as illustrated in Fig.~\ref{fig:adaptive_radius}. For a selected radius $r_{t-1}$, the radial sampling interval is defined as $\delta_r = {r_{t-1}}/{N_r}$, which makes the \RevisionAdd{radial sampling interval of the vertical distance map }grow linearly with the sensing radius\RevisionAdd{; the angular span and number of bins remain fixed}. Therefore, a larger radius extends the perceptual horizon but coarsens sampling resolution, while a smaller radius concentrates the grids and yields finer resolution. \RevisionAdd{When long-range perception is unnecessary, reducing }the sensing radius \RevisionAdd{can also limit the influence of }distal sensor noise \RevisionAdd{by excluding distant returns from the map}.
 \end{itemize}
 
-\begin{figure}[h]
+The critic operates on a privileged observation space to facilitate accurate estimation of the value function $V_t$. In addition to the actor's input vector $o_t$, the critic receives the noise-free ground-truth elevation map $\hat{\mathbf{E}}_t$ directly acquired from the simulation engine.
+
+
+\subsubsection{Action Space}
+
+\RevisionAdd{At $50$ Hz, the policy outputs $\mu_t\in\mathbb{R}^{13}$. Its first 12 elements set joint targets for a low-level Proportional-Derivative (PD) controller:
+\begin{equation}
+    q_t = s_a \cdot \mu_{t,1:12} + q_{\text{default}},
+\end{equation}
+where $s_a$ is the action scale and $q_{\text{default}}$ the nominal configuration. }
+
+\RevisionAdd{The final element sets $r_t\in[1,5]$\,m, avoiding insufficient lookahead below 1\,m and excessive distal noise above 5\,m.
+It controls only the radial sensing range of the vertical distance map $\mathbf{D}_t$, while the horizontal elevation map $\mathbf{E}_t$ uses a fixed spatial extent and sampling resolution. 
+$\mathbf{D}_t$ uses a cylindrical sector grid with a fixed number of bins $(N_r, N_\theta) = (13, 17)$ as illustrated in Fig.~\ref{fig:adaptive_radius}. For a selected radius $r_{t}$, the radial sampling interval is defined as
+$\delta_r = {r_{t}}/{N_r}$,
+which makes the radial sampling interval of the vertical distance map grow linearly with the sensing radius; the angular span and number of bins remain fixed. Therefore, a larger radius extends the perceptual horizon but coarsens sampling resolution, while a smaller radius concentrates the grids and yields finer resolution. When long-range perception is unnecessary, reducing the sensing radius can also limit the influence of distal sensor noise by excluding distant returns from the map.}
+
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.9\columnwidth]{figure/adaptive_radius_3d.png}
     \caption{Illustration of the adaptive \RevisionAdd{sensing }radius mechanism \RevisionAdd{for the vertical distance map}. The vertical distance map is constructed on a cylindrical sector with a fixed number of cells ($17 \times 13$). A smaller radius (blue) provides higher spatial resolution for precise near-field sensing, while a larger radius (purple) extends the perception range at the cost of reduced resolution.
@@ -229,18 +245,8 @@ The specific components in~\eqref{eq:observation_vector} are:
     \label{fig:adaptive_radius}
 \end{figure}
 
-The critic operates on a privileged observation space to facilitate accurate estimation of the value function $V_t$. In addition to the actor's input vector $o_t$, the critic receives the noise-free ground-truth elevation map $\hat{\mathbf{E}}_t$ directly acquired from the simulation engine.
-
-
-\subsubsection{Action Space}
-\RevisionAdd{At }$50$ Hz\RevisionAdd{, the policy outputs $\mu_t\in\mathbb{R}^{13}$. Its }first 12 elements \RevisionAdd{set joint targets for }a low-level Proportional-Derivative (PD) controller\RevisionAdd{:
-}\begin{equation}
-    \RevisionAdd{q_t = s_a \cdot \mu_{t,1:12} + q_{\text{default}},
-}\end{equation}
-\RevisionAdd{where $s_a$ is the action scale and $q_{\text{default}}$ the nominal configuration. }\textit{Adaptive Perception Radius:} The final element \RevisionAdd{sets $r_t\in[1,5]$}\,m\RevisionAdd{, adjusting only the next vertical distance map's radial range and sampling interval. This empirical range avoids insufficient lookahead below }1\,m \RevisionAdd{and }excessive distal noise \RevisionAdd{above 5\,m.
-}
-
 \subsubsection{Reward Functions}
+
 The reward function $\mathcal{R}$ integrates multiple objectives to encourage robust and efficient locomotion adhering to safety constraints. The total reward \RevisionAdd{$\mathcal{R}_t = \sum_i w_i r_i(t)$ }is a weighted sum of the following components:
 
 \begin{itemize}
@@ -248,7 +254,14 @@ The reward function $\mathcal{R}$ integrates multiple objectives to encourage ro
 
     \item \textit{Safety Mechanisms:} Safe and prolonged operation is ensured by penalizing critical failures such as body collisions, mesh interpenetrations, and joint limit violations. Furthermore, survival bonuses and foot air-time rewards are provided to foster dynamic and robust obstacle clearance.
 
-    \item \textit{Active Perception:} The \RevisionAdd{sensing radius of the vertical distance map is learned jointly with locomotion via the task rewards and two radius regularization terms: a smoothness term penalizes frame-to-frame radius changes, and a deviation term penalizes squared deviations from the initial radius, ensuring }smooth and stable \RevisionAdd{sensing }adjustments.
+    \item \textit{Active Perception:} \RevisionAdd{The sensing radius of the vertical distance map is learned jointly with locomotion through task rewards and two radius regularization terms. Their weighted contributions to the total reward are
+    \[
+    \begin{aligned}
+    R_{\mathrm{smooth}}(t)&=-\lambda_s|r_t-r_{t-1}|,\\
+    R_{\mathrm{reg}}(t)&=-\lambda_r(r_t-r_{\mathrm{init}})^2,
+    \end{aligned}
+    \]
+    where $r_t$, $r_{t-1}$, and $r_{\mathrm{init}}$ denote the current, previous, and initial sensing radii. These terms discourage abrupt radius changes and deviations from the initial radius.}.
 \end{itemize}
 
 \subsubsection{Terrain Design}
@@ -264,7 +277,34 @@ A curriculum-based strategy is adopted where each terrain type $\tau$ is paramet
     \label{fig:terrain}
 \end{figure}
 
-\begin{table}[h]
+\subsection{Training Architecture}
+\label{sec:training_architecture}
+
+As shown in Fig.~\ref{fig:network_architecture}, two separate MLP encoders \RevisionAdd{map }$\mathbf{E}_t$ and $\mathbf{D}_t$ \RevisionAdd{to }32-dimensional \RevisionAdd{features, concatenated into }a 64-dimensional environmental embedding and fused with \RevisionAdd{proprioception before separate }actor and critic \RevisionAdd{LSTMs. The critic additionally receives the noise-free simulation elevation map; the actor uses only deployable observations}. \RevisionAdd{Let $\mathbf{h}_t^a$ and $\mathbf{h}_t^c$ denote the LSTM hidden states of the actor and critic at time step $t$, respectively. The recurrent inputs are $(\mathbf{h}_{t-1}^a,\mathbf{c}_{t-1}^a)$ for the actor and $(\mathbf{h}_{t-1}^c,\mathbf{c}_{t-1}^c)$ for the critic, where $\mathbf{c}_{t-1}^a$ and $\mathbf{c}_{t-1}^c$ denote their respective LSTM cell states at the previous time step. The actor's MLP maps $\mathbf{h}_t^a$ to joint targets and the next vertical-map sensing radius, closing the perception-control loop.}
+
+% to effectively treat perception as an actuated degree of freedom.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experiments}
+\label{sec:experiment}
+
+\subsection{Experimental Configuration}
+\label{sec:method_terrain}
+
+\subsubsection{Simulation Environment} 
+
+\RevisionAdd{All policies are trained for a 12-DoF Unitree G1 humanoid robot using NVIDIA Isaac Gym~\cite{Isaac_Gym} on a modified NVIDIA RTX 4090 GPU with 48 GB of VRAM.} LiDAR point clouds are synthesized using the simulator from~\cite{Wang_2025_Omni-Perception} \RevisionAdd{to} accurately model sensor noises and occlusion from static terrains and dynamic robot links.
+
+\subsubsection{Real-world Environment} The trained policy is then deployed on a physical Unitree G1 robot. A Livox Mid-360 LiDAR is mounted on the head to provide raw point cloud data. State estimation and point cloud registration are handled by Fast-LIO2~\cite{Xu_2022_FAST-LIO2}. \RevisionAdd{The horizontal elevation map }$\mathbf{E}_t$ \RevisionAdd{and the vertical distance map $\mathbf{D}_t$ }are extracted from the registered point cloud using the GPU-accelerated pipeline from~\cite{ElevationMap_GPU_2022} at $10$ Hz. 
+% The vertical distance map $\mathbf{D}_t$ is generated at $10$ Hz as well. Registered points are projected into a polar sector spanning $-45^\circ$ to $+45^\circ$. Each map cell records the distance to the nearest obstacle. 
+The map generation follows the exact same procedure used in simulation. \RevisionAdd{In all real-world deployment experiments, perception and policy inference run on a local computer with an Intel i7-12700H CPU and an NVIDIA RTX 3060 Laptop GPU with 6 GiB VRAM. The local computer generates and sends joint-angle targets to the robot at $50$ Hz}.
+
+\subsection{Simulation Experiments}
+\subsubsection{Evaluation Setup}
+All methods are evaluated on the highest difficulty tier of \textit{BarrierTrack}. The benchmark includes all seven terrain primitives, grouped into two categories: terrains that require precise foot placement like Stairs, Drop, Jump and Hurdle, and the others that require traversable-space selection like Beam, Pole and Narrow Gate. For each terrain type, every episode contains five obstacles of the same class with progressively increasing difficulty; obstacle parameters are sampled within the range given in Table~\ref{tab:terrain_params} according to the curriculum schedule.
+
+\begin{table}[t]
 \vspace{3pt}
 \centering
 \caption{Parameters for generating curriculum training terrains. The $\uparrow$ symbol indicates the parameter value increases as difficulty scales up ($\mathbf{p}_\tau^{\min} < \mathbf{p}_\tau^{\max}$), while the $\downarrow$ symbol indicates the value decreases as the task becomes harder ($\mathbf{p}_\tau^{\min} > \mathbf{p}_\tau^{\max}$).}
@@ -298,35 +338,9 @@ A curriculum-based strategy is adopted where each terrain type $\tau$ is paramet
 \end{tabular}
 \end{table}
 
-\subsection{Training Architecture}
-\label{sec:training_architecture}
-
-As shown in Fig.~\ref{fig:network_architecture}, two separate MLP encoders \RevisionAdd{map }$\mathbf{E}_t$ and $\mathbf{D}_t$ \RevisionAdd{to }32-dimensional \RevisionAdd{features, concatenated into }a 64-dimensional environmental embedding and fused with \RevisionAdd{proprioception before separate }actor and critic \RevisionAdd{LSTMs. The critic additionally receives the noise-free simulation elevation map; the actor uses only deployable observations}. Conditioned on \RevisionAdd{its }recurrent hidden state \RevisionAdd{$\mathbf{h}^{a}_t$}, the actor outputs \RevisionAdd{joint targets and the next vertical-map sensing radius, closing the perception-control loop.
-}
-
-% to effectively treat perception as an actuated degree of freedom.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiments}
-\label{sec:experiment}
-
-\subsection{Experimental Configuration}
-\label{sec:method_terrain}
-
-\subsubsection{Simulation Environment} All policies are trained using NVIDIA Isaac Gym~\cite{Isaac_Gym} on \RevisionAdd{a modified }NVIDIA RTX 4090 GPU with \RevisionAdd{48 GB of VRAM, using }a 12-DoF Unitree G1 humanoid robot. LiDAR point clouds are synthesized using the simulator from~\cite{Wang_2025_Omni-Perception}, which can accurately model sensor noises and occlusion from static terrains and dynamic robot links.
-
-\subsubsection{Real-world Environment} The trained policy is then deployed on a physical Unitree G1 robot. A Livox Mid-360 LiDAR is mounted on the head to provide raw point cloud data. State estimation and point cloud registration are handled by Fast-LIO2~\cite{Xu_2022_FAST-LIO2}. \RevisionAdd{The horizontal elevation map }$\mathbf{E}_t$ \RevisionAdd{and the vertical distance map $\mathbf{D}_t$ }are extracted from the registered point cloud using the GPU-accelerated pipeline from~\cite{ElevationMap_GPU_2022} at $10$ Hz. 
-% The vertical distance map $\mathbf{D}_t$ is generated at $10$ Hz as well. Registered points are projected into a polar sector spanning $-45^\circ$ to $+45^\circ$. Each map cell records the distance to the nearest obstacle. 
-The map generation follows the exact same procedure used in simulation. \RevisionAdd{In all real-world deployment experiments, perception and policy inference run on a local computer with an Intel i7-12700H CPU and an NVIDIA RTX 3060 Laptop GPU with 6 GiB VRAM. The local computer generates and sends joint-angle targets to the robot at }$50$ \RevisionAdd{Hz}.
-
-\subsection{Simulation Experiments}
-\subsubsection{Evaluation Setup}
-All methods are evaluated on the highest difficulty tier of \textit{BarrierTrack}. The benchmark includes all seven terrain primitives, grouped into two categories: terrains that require precise foot placement like Stairs, Drop, Jump and Hurdle, and the others that require traversable-space selection like Beam, Pole and Narrow Gate. For each terrain type, every episode contains five obstacles of the same class with progressively increasing difficulty; obstacle parameters are sampled within the range given in Table~\ref{tab:terrain_params} according to the curriculum schedule.
-
 \subsubsection{Metrics}
 Robot performance is evaluated by the mean and standard deviations over two metrics:
-(1) Success Rate ($R_{\mathrm{succ}}$), which is the fraction of discrete obstacles that the robot successfully navigates within a single trial, i.e., the number of obstacles crossed divided by 5. 
+(1) Success Rate ($R_{\mathrm{succ}}$), which is the fraction of discrete obstacles that the robot successfully navigates within a single trial, i.e., the number of obstacles crossed divided by 5, 
 % It measures the policy's obstacle-negotiation reliability.
 and (2) Normalized Traversal Progress ($R_{\mathrm{trav}}$), which is the forward distance traveled along the course normalized by the total track length. Note that $R_{\mathrm{trav}}$ is typically no lower than $R_{\mathrm{succ}}$, as the robot may stumble forward for some distance even after failing to clear an obstacle, thereby accumulating partial traversal progress.
 % It evaluates the overall capability to string together continuous locomotion skills.
@@ -378,11 +392,13 @@ Gallant~\cite{Ben_2025_Gallant}    & 54.67\ci{16.28} & 62.47\ci{14.21} & 32.00\c
 % \end{center}
 \end{table*}
 
-Table~\ref{tab:main_results} details the performance comparison, while Table~\ref{tab:efficiency}\RevisionAdd{(a) }presents the associated training costs. ADAPT (Ours) achieves the highest success rates across all terrains while requiring \RevisionAdd{less training time per iteration and lower peak GPU memory than the Gallant and TSDF baselines}.
+\RevisionAdd{Table~\ref{tab:main_results} details the performance comparison}.
+% , while Table~\ref{tab:efficiency}\RevisionAdd{(a) }presents the associated training costs. 
+ADAPT (Ours) achieves the highest success rates across all terrains while requiring \RevisionAdd{less training time per iteration and lower peak GPU memory than the Gallant and TSDF baselines}.
 The performance of the baselines is consistent with the sensing characteristics within each method.
 PIM relies on a 2.5D elevation map and shows reduced performance on Pole and Narrow Gate terrains where vertical and lateral clearance cues are important. Parkour uses depth images and performs less reliably on terrains requiring broader spatial coverage, such as Jump, Hurdle and Beam. TSDF provides volumetric awareness, but its performance remains limited on fine-grained terrains although incurring the highest training cost. Gallant improves spatial coverage relative to the other baselines, but its higher-dimensional voxel input requires higher computational cost and achieves lower success rates than ADAPT on most terrains. Overall, ADAPT provides a favorable balance between traversal performance and computation efficiency across various tasks.
 
-\RevisionAdd{Although voxels preserve richer 3D geometry, our Gallant implementation trades sensing coverage for fine resolution under a fixed voxel count and computational budget. Its performance gap widens at high speed, where obstacles entering view trigger abrupt deceleration and occasional imbalance, suggesting insufficient look-ahead for smooth motion adjustment. ADAPT instead adjusts its look-ahead distance to the robot's motion state.
+\RevisionAdd{Although voxels preserve richer 3D geometry, our Gallant implementation trades sensing coverage for fine resolution under a fixed voxel count and computational budget. Its performance gap widens at high speeds, where obstacles entering view trigger abrupt deceleration and occasional imbalance, suggesting insufficient look-ahead for smooth motion adjustment. ADAPT instead adjusts its look-ahead distance to the robot's motion state.
 }
 
 \RevisionAdd{All methods use identical hardware and training settings (parallel environments, rollout length, PPO epochs, and batch settings). Table~\ref{table:comparison_method} compares per-frame, pre-encoding actor exteroceptive dimensions: Gallant uses $32\times32\times40=40{,}960$ values and ADAPT uses $21\times17+13\times17=578$, a $98.6\%$ reduction. Proprioception, observation history, and critic-only inputs are excluded.
@@ -422,24 +438,26 @@ TSDF & 246 & 38473 \\
 \end{table*}
 
 
-\RevisionAdd{PIM has }the lowest training cost \RevisionAdd{but lacks body-clearance information. ADAPT incurs a moderate cost increase over PIM while remaining cheaper than the volumetric baselines}.
+\RevisionAdd{Besides, although PIM has the lowest training cost, it lacks body-clearance information. ADAPT incurs a moderate cost increase over PIM while remaining cheaper than the volumetric baselines}.
 
 \subsubsection{Ablation Study on Adaptive Mechanism}
-To specifically validate the obstacle avoidance capability of the adaptive mechanism, the ablation study focuses on Beam, Pole and Narrow Gate terrains where perception is critical. \RevisionAdd{For each method, terrain, and speed command, 10 trials are conducted in simulation. Table~\ref{tab:ablation_radius} reports the success rate averaged over the three terrains.
+To specifically validate the obstacle avoidance capability of the adaptive mechanism, the ablation study focuses on Beam, Pole and Narrow Gate terrains where perception is critical. \RevisionAdd{For each method, terrain, and speed command, 10 trials are conducted in simulation. 
+% Table~\ref{tab:ablation_radius} reports the success rate averaged over the three terrains.
 }
 
 Besides the proposed method, two additional settings isolating the effect of radius representation and reward formulation are considered:
 1) \textit{Fixed Radius}, where the sensing radius $r_t$ is excluded from the observation and action spaces. The policy operates with a constant radius. Separate policies are trained with $R \in \{1, 3, 5\}$\,m.
-2) \textit{w/o Adaptive Reward}, where $r_t$ \RevisionAdd{remains }both an observation and an action, \RevisionAdd{but the \texttt{radius\_smoothness} and \texttt{radius\_regularization} reward terms are removed. All other reward terms are retained}.
+2) \textit{w/o Adaptive Reward}, where $r_t$ \RevisionAdd{remains }both an observation and an action, \RevisionAdd{but the radius smoothness term $R_{\mathrm{smooth}}(t)$
+and radius regularization term $R_{\mathrm{reg}}(t)$ are removed. All other reward terms are retained}.
 
-Table~\ref{tab:ablation_radius} summarizes the ablation results. \RevisionAdd{As in }the main benchmark\RevisionAdd{, each trial }evaluates traversal through a \RevisionAdd{sequence of five obstacles of the same terrain type at a fixed speed command. The success rate }$R_{\mathrm{succ}}$ is \RevisionAdd{the fraction of the five obstacles successfully crossed in a trial. The table reports the mean and standard deviation over the 30 trial-level success rates pooled across Beam, Pole, and Narrow Gate at each speed}.
+Table~\ref{tab:ablation_radius} summarizes the ablation results. \RevisionAdd{As in the main benchmark, each trial evaluates traversal through a sequence of five obstacles of the same terrain type at a fixed speed command. The success rate $R_{\mathrm{succ}}$ is the fraction of the five obstacles being successfully crossed in a trial. The table reports the mean and standard deviation over the 30 trial-level success rates pooled across Beam, Pole, and Narrow Gate at each speed}.
 
 A short fixed radius ($R=1$) yields the lowest average success rates, particularly at higher speeds, indicating that the limited look-ahead range is insufficient for these terrains. 
 % A long fixed radius ($R=5$) performs better than $R=1$ at high speed but remains clearly below the full adaptive model, suggesting a trade-off between larger look-ahead range and reduced local resolution. A moderate fixed radius ($R=3$) outperforms both extremes, but its performance still drops as commanded speed increases. This drop can be further enlarged at $v=1.5$\,m/s if the adaptive reward is fully removed (w/o Adaptive Reward), which indicates that treating the sensing radius as an action alone is not sufficient to recover the best sensing behavior. 
 A long fixed radius ($R=5$) performs better than $R=1$ at high speeds but remains inferior to a moderate fixed radius ($R=3$), suggesting a trade-off between larger look-ahead range and reduced local resolution. However, the performance of a fixed radius is still behind the fully adaptive method. \RevisionAdd{Removing both radius-related rewards in \textit{w/o Adaptive Reward} lowers success at higher speeds, where less time for perception and avoidance may increase sensitivity to unsuitable or fluctuating sensing ranges. Together, the smoothness and regularization terms help stabilize radius selection and its coordination with locomotion}.
 Overall, the fully adaptive method achieves the highest average success rate, indicating efficacy of the proposed closed-loop radius modulation.
 
-\begin{table}[!ht]
+\begin{table}[t]
 \centering
 \caption{Ablation on adaptive sensing radius. $R_\mathrm{succ}$: success rate (\%). Values are averaged over Beam, Pole, and Narrow Gate terrains.}
 \label{tab:ablation_radius}
@@ -472,9 +490,9 @@ Adaptive Radius                & \textbf{Ours}         & \textbf{94.67\ci{10.24}
 \subsection{Real-world Experiments}
 \subsubsection{Deployment}
 
-\RevisionAdd{ADAPT transfers directly to the }Unitree G1 \RevisionAdd{without }fine-tuning \RevisionAdd{(}Fig.~\ref{fig:real_deploy}\RevisionAdd{). For Fig.~\ref{fig:succ}, final checkpoints from ten independent training seeds are evaluated in matched simulation and }real-world \RevisionAdd{scenes with a fixed single-obstacle configuration per terrain. Each policy is tested once per terrain at each speed ($v\in\{0.5,1.0,1.5\}$}\,m/s), \RevisionAdd{totaling }30 trials \RevisionAdd{per terrain and domain}.
+\RevisionAdd{ADAPT transfers directly to the Unitree G1 without fine-tuning (Fig.~\ref{fig:real_deploy}). In Fig.~\ref{fig:succ}, final checkpoints from ten independent training seeds are evaluated in matched simulation and real-world scenes with a fixed single-obstacle configuration per terrain. Each policy is tested once per terrain at each speed ($v\in\{0.5,1.0,1.5\}$\,m/s), totaling 30 trials per terrain and domain}.
 
-In terrains that require traversable-space selection, the robot identifies viable regions using the vertical distance map $\mathbf{D}_t$. When encountering aerial obstacles such as beams, the robot lowers its body to crouch underneath the beams and resumes to the normal posture afterward. For narrow pillar-like obstacles, the robot autonomously adjusts its heading to bypass the poles. When facing narrow gates, it precisely aligns its orientation with the traversable path. In terrains requiring precise foot placement, the robot relies on the elevation map $\mathbf{E}_t$ to stably ascend stairs, negotiate drops and jumps, and step over hurdles. \RevisionAdd{The adaptive }sensing radius of \RevisionAdd{the vertical distance map further enables the policy to regulate its perception horizon online during }high-speed \RevisionAdd{locomotion}.
+In terrains that require traversable-space selection, the robot identifies viable regions using the vertical distance map $\mathbf{D}_t$. When encountering aerial obstacles such as beams, the robot lowers its body to crouch underneath the beams and resumes to the normal posture afterward. For narrow pillar-like obstacles, the robot autonomously adjusts its heading to bypass the poles. When facing narrow gates, it precisely aligns its orientation with the traversable path. In terrains requiring precise foot placement, the robot relies on the elevation map $\mathbf{E}_t$ to stably ascend stairs, negotiate drops and jumps, and step over hurdles. \RevisionAdd{The adaptive sensing radius of the vertical distance map further enables the policy to regulate its perception horizon online during high-speed locomotion}.
 
 \subsubsection{Results}
 
@@ -487,7 +505,7 @@ In terrains that require traversable-space selection, the robot identifies viabl
     % \vspace{-5pt}
 \end{figure}
 
-Fig.~\RevisionAdd{\ref{fig:real_deploy} demonstrates zero-shot sim-to-real transfer across all seven terrains, while Fig.~\ref{fig:succ} presents the corresponding }per-terrain success rates \RevisionAdd{in }simulation and physical deployment. Despite an inherent sim-to-real domain gap, the real-world success rates closely follow the trend of their counterparts in simulation, maintaining \RevisionAdd{at least }$80\%$ success rates across all terrains. The physical robot exhibits a range of whole-body behaviors, including stair ascent and descent, stepping across drops and gaps, crouching under beams of varying height, and navigating through narrow passages and pole fields, suggesting good generality and practical applicability of the learned policy. 
+\RevisionAdd{As a result, Fig.~\ref{fig:real_deploy} demonstrates zero-shot sim-to-real transfer across all seven terrains, while Fig.~\ref{fig:succ} presents the corresponding per-terrain success rates in simulation and physical deployment.} Despite an inherent sim-to-real domain gap, the real-world success rates closely follow the trend of their counterparts in simulation, maintaining \RevisionAdd{at least }$80\%$ success rates across all terrains. The physical robot exhibits a range of whole-body behaviors, including stair ascent and descent, stepping across drops and gaps, crouching under beams of varying height, and navigating through narrow passages and pole fields, suggesting good generality and practical applicability of the learned policy. 
 
 \subsubsection{\RevisionAdd{Runtime Efficiency}}
 \RevisionAdd{Table~\ref{tab:efficiency}(b) compares ADAPT and Gallant on a local computer (i7-12700H, RTX 3060 Laptop GPU with 6 GiB VRAM). The runtime benchmarks use the same local-computer deployment setup as the real-world robot experiments. Each method is tested five times on each of three terrain categories (flat, single obstacle, and complex environment). Map latency spans the input callback to the first observed map-ready event; perception-to-publish latency spans the same input callback to the first command-publication call using that update. Inference latency is measured using current-stream CUDA events. ADAPT reduces mean perception-to-publish latency by $29.6\%$ using the larger of the two stream means and peak GPU memory by $58.4\%$ relative to Gallant, with lower CPU/RAM usage.
@@ -498,7 +516,7 @@ Fig.~\RevisionAdd{\ref{fig:real_deploy} demonstrates zero-shot sim-to-real trans
 % The consistent sim-to-real performance confirms that ADAPT's two design choices—the vertical distance map for compact 3D constraint encoding and the adaptive sensing radius for online horizon regulation—are more effective than heavy 3D reconstruction or multi-stage training. Well-structured inputs matter more than model complexity for agile humanoid navigation.
 
 \section{Conclusions}
-This paper presented ADAPT, an adaptive dual-projection framework for perceptive humanoid traversal in complex 3D environments. By decomposing local geometry into a horizontal elevation map and a vertical distance map, ADAPT explicitly separates ground-support and body-level clearance constraints into a compact representation for high-frequency control. Furthermore, embedding the sensing radius into the action space enables the robot to dynamically adjust its perceptual horizon based on motion context. Experiments demonstrate that ADAPT significantly improves traversal robustness and computational efficiency over fixed-range and voxel-based alternatives, achieving successful zero-shot sim-to-real transfer on a Unitree G1 robot.
+This paper presents ADAPT, an adaptive dual-projection framework for perceptive humanoid traversal in complex 3D environments. By decomposing local geometry into a horizontal elevation map and a vertical distance map, ADAPT explicitly separates ground-support and body-level clearance constraints into a compact representation for high-frequency control. Furthermore, embedding the sensing radius into the action space enables the robot to dynamically adjust its perceptual horizon based on motion context. Experiments demonstrate that ADAPT significantly improves traversal robustness and computational efficiency over fixed-range and voxel-based alternatives, achieving successful zero-shot sim-to-real transfer on a Unitree G1 robot.
 
 Despite these capabilities, the current framework focuses solely on geometric traversability and adapts only the sensing radius. Future work will investigate richer active perception policies that jointly optimize sensing scale, resolution, and update frequency, while incorporating semantic reasoning to enable long-horizon navigation in complex, human-centered environments.
 
